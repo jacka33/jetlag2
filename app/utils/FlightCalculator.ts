@@ -50,12 +50,13 @@ function CalculateDistance(
     dist = dist * 180/Math.PI;
     dist = dist * 60 * 1.1515;
     dist = dist * 0.8684; // nautical miles
-    return dist;
+    return Math.round(dist);
   }
 }
 
 function CalculateFlightTime(distanceNm: number): number {
-  const flightTime = distanceNm / AVERAGE_SPEED_KTS;
+  // calculate flight time in minutes 
+  const flightTime = (distanceNm / AVERAGE_SPEED_KTS) * 60;
   return Math.round(flightTime*1.1); // add 10% for takeoff/climb/descent/landing
 }
 
