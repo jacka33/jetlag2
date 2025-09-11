@@ -30,21 +30,29 @@ export default function Form({ airports }: { airports: Airport[] }) {
   const [query, setQuery] = useState('');
   const [arrivalQuery, setArrivalQuery] = useState('');
 
-  const validAirportCodes = new Set(airports.map((a) => a.code));
-  const codeEnum = z.enum(Array.from(validAirportCodes)).or(z.literal(""));
+  // const validAirportCodes = new Set(airports.map((a) => a.code));
+  // const codeEnum = z.enum(Array.from(validAirportCodes)).or(z.literal(""));
 
   const formSchema = z.object({
-    departure: AirportSchema,
-    arrival: AirportSchema,
-    departureDateTime: z.iso.datetime({ local: true }),
+    departure: AirportSchema.optional().nullable().refine(
+      (val) => !!val && !!val.code,
+      { message: "Choose a departure airport" }
+    ),
+    arrival: AirportSchema.optional().nullable().refine(
+      (val) => !!val && !!val.code,
+      { message: "Choose an arrival airport" }
+    ),
+    departureDateTime: z.iso.datetime({ local: true, error: "Invalid date/time" }),
   });
 
   type FormData = z.infer<typeof formSchema>;
 
   const { handleSubmit, control, reset, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    mode: "onChange",
+    mode: "onSubmit",
     defaultValues: {
+      departure: null,
+      arrival: null,
       departureDateTime: "",
     },
   });
@@ -53,13 +61,13 @@ export default function Form({ airports }: { airports: Airport[] }) {
 
   const onSubmit = (data: FormData) => {
 
-    const validDep = codeEnum.safeParse(data.departure?.code || "");
-    const validArr = codeEnum.safeParse(data.arrival?.code || "");
+    // const validDep = codeEnum.safeParse(data.departure?.code || "");
+    // const validArr = codeEnum.safeParse(data.arrival?.code || "");
 
-    if (!validDep.success || !validArr.success) {
-      console.error("Invalid airport code");
-      return;
-    }
+    // if (!validDep.success || !validArr.success) {
+    //   console.error("Invalid airport code");
+    //   return;
+    // }
     console.log(data);
 
   }
@@ -118,7 +126,7 @@ export default function Form({ airports }: { airports: Airport[] }) {
                           className="block w-full rounded-md bg-white py-1.5 pr-12 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
                           onChange={(event) => setQuery(event.target.value)}
                           onBlur={() => setQuery('')}
-                          displayValue={(ap: Airport) => (ap && ap.name) ? ap.name : ''}
+                          displayValue={(ap: Airport) => (ap && ap.name && ap.code) ? `${ap.name} ${ap.code}` : ''}
                           placeholder='e.g. "Zurich" or "ZRH"'
                         />
                         <ComboboxButton className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-hidden">
@@ -147,6 +155,9 @@ export default function Form({ airports }: { airports: Airport[] }) {
                     </Combobox>
                   )}
                 />
+                {errors.departure && (
+                  <p className="mt-2 text-sm text-red-600">{errors.departure.message}</p>
+                )}
               </div>
             </div>
             {/* Arrival Combobox */}
@@ -172,7 +183,7 @@ export default function Form({ airports }: { airports: Airport[] }) {
                           className="block w-full rounded-md bg-white py-1.5 pr-12 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
                           onChange={(event) => setArrivalQuery(event.target.value)}
                           onBlur={() => setArrivalQuery('')}
-                          displayValue={(ap: Airport) => (ap && ap.name) ? ap.name : ''}
+                          displayValue={(ap: Airport) => (ap && ap.name && ap.code) ? `${ap.name} ${ap.code}` : ''}
                           placeholder='e.g. "Hong Kong" or "HKG"'
                         />
                         <ComboboxButton className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-hidden">
@@ -201,6 +212,9 @@ export default function Form({ airports }: { airports: Airport[] }) {
                     </Combobox>
                   )}
                 />
+                {errors.arrival && (
+                  <p className="mt-2 text-sm text-red-600">{errors.arrival.message}</p>
+                )}
               </div>
             </div>
             {/* Date/Time */}
@@ -222,6 +236,9 @@ export default function Form({ airports }: { airports: Airport[] }) {
                   )}
                 />
               </div>
+              {errors.departureDateTime && (
+                <p className="mt-2 text-sm text-red-600">{errors.departureDateTime.message}</p>
+              )}
             </div>
           </div>
           <div className="mt-6 flex items-center justify-end gap-x-6">
