@@ -30,25 +30,39 @@ export default function Form({ airports }: { airports: Airport[] }) {
   const [query, setQuery] = useState('');
   const [arrivalQuery, setArrivalQuery] = useState('');
 
+  const validAirportCodes = new Set(airports.map((a) => a.code));
+  const codeEnum = z.enum(Array.from(validAirportCodes)).or(z.literal(""));
+
   const formSchema = z.object({
-    departure: AirportSchema.nullable(),
-    arrival: AirportSchema.nullable(),
+    departure: AirportSchema,
+    arrival: AirportSchema,
     departureDateTime: z.iso.datetime({ local: true }),
   });
 
   type FormData = z.infer<typeof formSchema>;
 
-  const { handleSubmit, control, reset, formState } = useForm<FormData>({
+  const { handleSubmit, control, reset, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: "onChange",
     defaultValues: {
-      departure: null,
-      arrival: null,
       departureDateTime: "",
     },
   });
 
-  const onSubmit = (data: FormData) => console.log(data);
+  console.error(errors);
+
+  const onSubmit = (data: FormData) => {
+
+    const validDep = codeEnum.safeParse(data.departure?.code || "");
+    const validArr = codeEnum.safeParse(data.arrival?.code || "");
+
+    if (!validDep.success || !validArr.success) {
+      console.error("Invalid airport code");
+      return;
+    }
+    console.log(data);
+
+  }
 
   const filteredAirports = query.length > 0
     ? airports.filter(
