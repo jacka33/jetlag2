@@ -3,9 +3,9 @@ import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOption
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { useState } from 'react'
 import { useForm, Controller } from "react-hook-form"
-import { DateTime } from "luxon";
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { isValidDateTime } from '../utils/DateTimeValidator';
 
 const AirportSchema = z.object({
   code: z.string(),
@@ -15,7 +15,7 @@ const AirportSchema = z.object({
   longitude: z.string(),
   elevation: z.string().nullable(),
   url: z.string().nullable(),
-  time_zone: z.string(),
+  time_zone: z.string().min(1, "Timezone is missing. Try another airport."),
   city_code: z.string().nullable(),
   country: z.string(),
   city: z.string().nullable(),
@@ -29,6 +29,7 @@ type Airport = z.infer<typeof AirportSchema>;
 export default function Form({ airports }: { airports: Airport[] }) {
   const [query, setQuery] = useState('');
   const [arrivalQuery, setArrivalQuery] = useState('');
+  const [validDt, setValidDt] = useState(true);
 
   // const validAirportCodes = new Set(airports.map((a) => a.code));
   // const codeEnum = z.enum(Array.from(validAirportCodes)).or(z.literal(""));
@@ -60,6 +61,14 @@ export default function Form({ airports }: { airports: Airport[] }) {
   console.error(errors);
 
   const onSubmit = (data: FormData) => {
+
+    const validDt = isValidDateTime(data.departureDateTime, data.departure!.time_zone);
+
+    setValidDt(validDt);
+
+    if (!validDt) {
+      return;
+    }
 
     // const validDep = codeEnum.safeParse(data.departure?.code || "");
     // const validArr = codeEnum.safeParse(data.arrival?.code || "");
@@ -238,6 +247,9 @@ export default function Form({ airports }: { airports: Airport[] }) {
               </div>
               {errors.departureDateTime && (
                 <p className="mt-2 text-sm text-red-600">{errors.departureDateTime.message}</p>
+              )}
+              {!validDt && (
+                <p className="mt-2 text-sm text-red-600">Departure must be at least 3 days in the future.</p>
               )}
             </div>
           </div>
