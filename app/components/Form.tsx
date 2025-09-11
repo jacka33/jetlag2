@@ -3,25 +3,49 @@ import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOption
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { useState } from 'react'
 import { useForm, Controller } from "react-hook-form"
+import { DateTime } from "luxon";
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
 
-export default function Form({ airports }) {
+const AirportSchema = z.object({
+  code: z.string(),
+  icao: z.string().nullable(),
+  name: z.string(),
+  latitude: z.string(),
+  longitude: z.string(),
+  elevation: z.string().nullable(),
+  url: z.string().nullable(),
+  timezone: z.string(),
+  city_code: z.string().nullable(),
+  country: z.string(),
+  city: z.string().nullable(),
+  state: z.string().nullable(),
+  county: z.string().nullable(),
+  type: z.string().nullable(),
+});
+
+type Airport = z.infer<typeof AirportSchema>;
+
+export default function Form({ airports }: { airports: Airport[] }) {
   const [query, setQuery] = useState('');
   const [arrivalQuery, setArrivalQuery] = useState('');
-  // Remove local state for departure/arrival, use RHF instead
 
-  type FormData = {
-    departure: any;
-    arrival: any;
-    departureDateTime: string;
-  };
+  const formSchema = z.object({
+    departure: AirportSchema.nullable(),
+    arrival: AirportSchema.nullable(),
+    departureDateTime: z.iso.datetime({ offset: true }),
+  });
+
+  type FormData = z.infer<typeof formSchema>;
 
   const { handleSubmit, control, reset } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
       departure: null,
       arrival: null,
       departureDateTime: "",
     },
-    mode: "onChange",
   });
 
   const onSubmit = (data: FormData) => console.log(data);
@@ -80,7 +104,7 @@ export default function Form({ airports }) {
                           className="block w-full rounded-md bg-white py-1.5 pr-12 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
                           onChange={(event) => setQuery(event.target.value)}
                           onBlur={() => setQuery('')}
-                          displayValue={(ap) => ap?.name || ''}
+                          displayValue={(ap: Airport) => (ap && ap.name) ? ap.name : ''}
                           placeholder='e.g. "Zurich" or "ZRH"'
                         />
                         <ComboboxButton className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-hidden">
@@ -90,7 +114,7 @@ export default function Form({ airports }) {
                           transition
                           className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg outline-1 outline-black/5 sm:text-sm dark:bg-gray-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10"
                         >
-                          {filteredAirports.map((ap) => (
+                          {filteredAirports.map((ap: Airport) => (
                             <ComboboxOption
                               key={ap.code}
                               value={ap}
@@ -134,7 +158,7 @@ export default function Form({ airports }) {
                           className="block w-full rounded-md bg-white py-1.5 pr-12 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
                           onChange={(event) => setArrivalQuery(event.target.value)}
                           onBlur={() => setArrivalQuery('')}
-                          displayValue={(ap) => ap?.name || ''}
+                          displayValue={(ap: Airport) => (ap && ap.name) ? ap.name : ''}
                           placeholder='e.g. "Hong Kong" or "HKG"'
                         />
                         <ComboboxButton className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-hidden">
