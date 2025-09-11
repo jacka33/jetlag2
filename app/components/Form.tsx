@@ -15,7 +15,7 @@ const AirportSchema = z.object({
   longitude: z.string(),
   elevation: z.string().nullable(),
   url: z.string().nullable(),
-  timezone: z.string(),
+  time_zone: z.string(),
   city_code: z.string().nullable(),
   country: z.string(),
   city: z.string().nullable(),
@@ -33,12 +33,12 @@ export default function Form({ airports }: { airports: Airport[] }) {
   const formSchema = z.object({
     departure: AirportSchema.nullable(),
     arrival: AirportSchema.nullable(),
-    departureDateTime: z.iso.datetime({ offset: true }),
+    departureDateTime: z.iso.datetime({ local: true }),
   });
 
   type FormData = z.infer<typeof formSchema>;
 
-  const { handleSubmit, control, reset } = useForm<FormData>({
+  const { handleSubmit, control, reset, formState } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: "onChange",
     defaultValues: {
