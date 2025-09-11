@@ -8,7 +8,7 @@ import * as z from "zod"
 import { isValidDateTime } from '../utils/DateTimeValidator';
 import { CalculateDistance, CalculateFlightTime } from '../utils/FlightCalculator';
 import { useAppSelector, useAppDispatch } from '../redux/hooks';
-import { setDistance, setTime } from '../redux/flightSlice';
+import { setDistance, setTime, setDepCoords, setArrCoords } from '../redux/flightSlice';
 
 const AirportSchema = z.object({
   code: z.string(),
@@ -63,8 +63,6 @@ export default function Form({ airports }: { airports: Airport[] }) {
     },
   });
 
-  console.error(errors);
-
   const onSubmit = (data: FormData) => {
 
     const validDt = isValidDateTime(data.departureDateTime, data.departure!.time_zone);
@@ -88,6 +86,8 @@ export default function Form({ airports }: { airports: Airport[] }) {
 
     dispatch(setDistance(flightDistance)); // in nm
     dispatch(setTime(flightTime)); // in minutes
+    dispatch(setDepCoords([parseFloat(data.departure!.longitude), parseFloat(data.departure!.latitude)]));
+    dispatch(setArrCoords([parseFloat(data.arrival!.longitude), parseFloat(data.arrival!.latitude)]));
 
     console.log(data);
 
