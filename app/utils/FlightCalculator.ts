@@ -38,11 +38,11 @@ function CalculateDistance(
     return 0;
   }
   else {
-    var radlat1: number = Math.PI * lat1/180;
-    var radlat2: number = Math.PI * lat2/180;
-    var theta: number = lon1-lon2;
-    var radtheta: number = Math.PI * theta/180;
-    var dist: number = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+    const radlat1: number = Math.PI * lat1/180;
+    const radlat2: number = Math.PI * lat2/180;
+    const theta: number = lon1-lon2;
+    const radtheta: number = Math.PI * theta/180;
+    let dist: number = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
     if (dist > 1) {
       dist = 1;
     }
@@ -60,4 +60,17 @@ function CalculateFlightTime(distanceNm: number): number {
   return Math.round(flightTime*1.1); // add 10% for takeoff/climb/descent/landing
 }
 
-export { CalculateDistance, CalculateFlightTime };
+function CalculateDirection(lon1: number, lon2: number): string {
+  let direction = "";
+  const deltaLon = ((lon2 - lon1 + 540) % 360) - 180; // Normalize to [-180, 180]
+  if (deltaLon > 0) {
+    direction = "Eastbound";
+  } else if (deltaLon < 0) {
+    direction = "Westbound";
+  } else {
+    direction = "No longitudinal change";
+  }
+  return direction;
+}
+
+export { CalculateDistance, CalculateFlightTime, CalculateDirection };

@@ -11,7 +11,7 @@ export default function Results() {
         <p className="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
           Distance: {useAppSelector((state) => state.flight.distance)} nm (straight line)<br />
           Time: {useAppSelector((state) => (state.flight.time / 60).toFixed(1))} hours (estimated)<br />
-
+          Direction of travel: {useAppSelector((state) => state.flight.direction)}<br />
           Calculating....
 
         </p>

@@ -6,9 +6,9 @@ import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { isValidDateTime } from '../utils/DateTimeValidator';
-import { CalculateDistance, CalculateFlightTime } from '../utils/FlightCalculator';
+import { CalculateDistance, CalculateFlightTime, CalculateDirection } from '../utils/FlightCalculator';
 import { useAppSelector, useAppDispatch } from '../redux/hooks';
-import { setDistance, setTime, setDepCoords, setArrCoords } from '../redux/flightSlice';
+import { setDistance, setTime, setDepCoords, setArrCoords, setDirection } from '../redux/flightSlice';
 
 const AirportSchema = z.object({
   code: z.string(),
@@ -83,11 +83,14 @@ export default function Form({ airports }: { airports: Airport[] }) {
 
     const flightDistance = CalculateDistance(data.departure?.latitude, data.departure?.longitude, data.arrival?.latitude, data.arrival?.longitude);
     const flightTime = CalculateFlightTime(flightDistance); // returns time in whole minutes
+    const flightDirection = CalculateDirection(parseFloat(data.departure!.longitude), parseFloat(data.arrival!.longitude));
+
 
     dispatch(setDistance(flightDistance)); // in nm
     dispatch(setTime(flightTime)); // in minutes
     dispatch(setDepCoords([parseFloat(data.departure!.longitude), parseFloat(data.departure!.latitude)]));
     dispatch(setArrCoords([parseFloat(data.arrival!.longitude), parseFloat(data.arrival!.latitude)]));
+    dispatch(setDirection(flightDirection));
 
     console.log(data);
 
