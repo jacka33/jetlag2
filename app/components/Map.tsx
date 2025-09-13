@@ -34,9 +34,9 @@ export default function MapArcs({ from, to }) {
       data,
       getSourcePosition: d => d.source,
       getTargetPosition: d => d.target,
-      getSourceColor: [0, 128, 255],
+      getSourceColor: [255, 0, 128],
       getTargetColor: [255, 0, 128],
-      strokeWidth: 2,
+      strokeWidth: 10,
       greatCircle: true
     })
   ];
@@ -46,7 +46,7 @@ export default function MapArcs({ from, to }) {
       initialViewState={{
         longitude: (from[0] + to[0]) / 2,
         latitude: (from[1] + to[1]) / 2,
-        zoom: 1.5
+        zoom: 1,
       }}
       controller={true}
       layers={layers}
@@ -54,7 +54,7 @@ export default function MapArcs({ from, to }) {
     >
       <Map
         mapStyle="mapbox://styles/mapbox/streets-v11"
-        mapboxAccessToken={process.env.MAPBOX_TOKEN}
+        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
       />
     </DeckGL>
   );
