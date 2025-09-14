@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useAppSelector } from '../redux/hooks';
@@ -10,160 +10,132 @@ type Props = {
   to?: [number, number];   // [longitude, latitude]
 };
 
-function isValidCoord(coord: [number, number]): boolean {
-  return (
-    Array.isArray(coord) &&
-    coord.length === 2 &&
-    typeof coord[0] === "number" &&
-    typeof coord[1] === "number" &&
-    !isNaN(coord[0]) &&
-    !isNaN(coord[1]) &&
-    coord[0] >= -180 && coord[0] <= 180 &&
-    coord[1] >= -90 && coord[1] <= 90
-  );
-}
+// TODO: Handle antimeridian crossing
+function createGeometry(from, to) {
 
-/**
- * Create a great circle route that properly handles antimeridian crossing
- */
-function createGreatCircleGeoJSON(start: [number, number], end: [number, number]) {
-  const [startLng, startLat] = start;
-  const [endLng, endLat] = end;
+  // If the absolute difference in longitude is greater than 180 degrees,
+  // the shortest path crosses the antimeridian
+  const doesCrossAntimeridian = Math.abs(to[0] - from[0]) > 180;
 
-  console.log('Creating route from:', start, 'to:', end);
-
-  // Calculate the shortest path across longitude
-  let adjustedEndLng = endLng;
-  const deltaLng = endLng - startLng;
-
-  if (deltaLng > 180) {
-    adjustedEndLng = endLng - 360;
-  } else if (deltaLng < -180) {
-    adjustedEndLng = endLng + 360;
-  }
-
-  console.log('Delta longitude:', deltaLng, 'Adjusted end longitude:', adjustedEndLng);
-
-  // Generate points along the great circle
-  const numPoints = 100;
-  const coordinates: [number, number][] = [];
-
-  for (let i = 0; i <= numPoints; i++) {
-    const t = i / numPoints;
-
-    // For great circle calculation, we should use spherical interpolation
-    // But for simplicity and to ensure the line appears, let's use linear interpolation first
-    const lat = startLat + t * (endLat - startLat);
-    const lng = startLng + t * (adjustedEndLng - startLng);
-
-    coordinates.push([lng, lat]);
-  }
-
-  console.log('Generated', coordinates.length, 'points for route');
-  console.log('First few points:', coordinates.slice(0, 3));
-  console.log('Last few points:', coordinates.slice(-3));
-
-  return {
-    type: 'Feature' as const,
-    geometry: {
-      type: 'LineString' as const,
-      coordinates
-    },
-    properties: {}
+  const geometry = {
+    type: 'LineString',
+    coordinates: [
+      from,
+      to
+    ]
   };
+
+  // // To draw a line across the 180th meridian,
+  // // if the longitude of the second point minus
+  // // the longitude of original (or previous) point is >= 180,
+  // // subtract 360 from the longitude of the second point.
+  // // If it is less than 180, add 360 to the second point.
+
+  // if (doesCrossAntimeridian) {
+  //   const startLng = geometry.coordinates[0][0];
+  //   const endLng = geometry.coordinates[1][0];
+
+  //   if (endLng - startLng >= 180) {
+  //     geometry.coordinates[1][0] -= 360;
+  //   } else if (endLng - startLng < 180) {
+  //     geometry.coordinates[1][0] += 360;
+  //   }
+  // }
+
+  return geometry;
 }
 
 export default function MapArcs({ from, to }: Props) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
 
-  // Get coordinates from Redux store, fallback to props if provided
-  const depCoordsFromStore = useAppSelector(selectDepCoords);
-  const arrCoordsFromStore = useAppSelector(selectArrCoords);
+  // Get coordinates from Redux store
+  const depCoords = useAppSelector(selectDepCoords);
+  const arrCoords = useAppSelector(selectArrCoords);
 
   // Use props if provided, otherwise use Redux store
-  const fromCoords = from || depCoordsFromStore;
-  const toCoords = to || arrCoordsFromStore;
+  const fromCoords = from || depCoords;
+  const toCoords = to || arrCoords;
 
-  console.log('MapArcs called with from:', fromCoords, 'to:', toCoords);
-
-  // Parse coordinates to numbers if they are strings with stable references
-  const parsedFrom = useMemo((): [number, number] => {
-    if (!fromCoords || fromCoords.length !== 2) return [0, 0];
-    return [
-      typeof fromCoords[0] === 'string' ? parseFloat(fromCoords[0]) : fromCoords[0],
-      typeof fromCoords[1] === 'string' ? parseFloat(fromCoords[1]) : fromCoords[1]
-    ];
-  }, [fromCoords]);
-
-  const parsedTo = useMemo((): [number, number] => {
-    if (!toCoords || toCoords.length !== 2) return [0, 0];
-    return [
-      typeof toCoords[0] === 'string' ? parseFloat(toCoords[0]) : toCoords[0],
-      typeof toCoords[1] === 'string' ? parseFloat(toCoords[1]) : toCoords[1]
-    ];
-  }, [toCoords]);
-
-  console.log('Parsed coordinates - from:', parsedFrom, 'to:', parsedTo);
+  console.log('MapArcs coords:', { fromCoords, toCoords });
 
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // Initialize map only once
+    // Simple validation
+    if (!fromCoords || !toCoords ||
+      fromCoords[0] === 0 || fromCoords[1] === 0 ||
+      toCoords[0] === 0 || toCoords[1] === 0) {
+      console.log('Invalid coordinates, skipping map');
+      return;
+    }
+
+    // Get token
+    const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+    if (!token) {
+      console.error('No Mapbox token found');
+      mapContainer.current.innerHTML = '<div style="padding: 20px; text-align: center;">Mapbox token required</div>';
+      return;
+    }
+
+    // Initialize map
     if (!map.current) {
-      const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-      console.log('Mapbox token available:', !!token);
-
-      if (!token) {
-        console.error('NEXT_PUBLIC_MAPBOX_TOKEN is not set');
-        return;
-      }
-
       mapboxgl.accessToken = token;
 
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
+        projection: 'rectangular',
         style: 'mapbox://styles/mapbox/light-v11',
-        center: [0, 20],
-        zoom: 1,
-        projection: 'mercator'
+        center: [(fromCoords[0] + toCoords[0]) / 2, (fromCoords[1] + toCoords[1]) / 2],
+        zoom: 2
       });
 
       map.current.on('load', () => {
-        console.log('Map loaded successfully');
         if (!map.current) return;
 
-        // Add the route source
+        // Add line
         map.current.addSource('route', {
           type: 'geojson',
           data: {
-            type: 'FeatureCollection',
-            features: []
+            type: 'Feature',
+            geometry: createGeometry(fromCoords, toCoords),
+            properties: {}
           }
         });
 
-        // Add the route layer
         map.current.addLayer({
           id: 'route',
           type: 'line',
           source: 'route',
-          layout: {
-            'line-join': 'round',
-            'line-cap': 'round'
-          },
           paint: {
             'line-color': '#ff0080',
-            'line-width': 3,
-            'line-opacity': 0.8
+            'line-width': 3
           }
         });
 
-        // Add markers for start and end points
+        // Add markers
         map.current.addSource('markers', {
           type: 'geojson',
           data: {
             type: 'FeatureCollection',
-            features: []
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'Point',
+                  coordinates: fromCoords
+                },
+                properties: {}
+              },
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'Point',
+                  coordinates: toCoords
+                },
+                properties: {}
+              }
+            ]
           }
         });
 
@@ -172,110 +144,33 @@ export default function MapArcs({ from, to }: Props) {
           type: 'circle',
           source: 'markers',
           paint: {
-            'circle-radius': 6,
+            'circle-radius': 8,
             'circle-color': '#ff0080',
             'circle-stroke-width': 2,
             'circle-stroke-color': '#ffffff'
           }
         });
-      });
 
-      map.current.on('error', (e) => {
-        console.error('Mapbox error:', e);
+        // Fit to bounds
+        const bounds = new mapboxgl.LngLatBounds();
+        bounds.extend(fromCoords);
+        bounds.extend(toCoords);
+        map.current.fitBounds(bounds, { padding: 50 });
       });
     }
 
-    // Cleanup function
     return () => {
       if (map.current) {
         map.current.remove();
         map.current = null;
       }
     };
-  }, []); // Only run once
+  }, [fromCoords, toCoords]);
 
-  // Separate effect to update the route when coordinates change
-  useEffect(() => {
-    if (
-      !map.current ||
-      !isValidCoord(parsedFrom) ||
-      !isValidCoord(parsedTo) ||
-      (parsedFrom[0] === 0 && parsedFrom[1] === 0 && parsedTo[0] === 0 && parsedTo[1] === 0)
-    ) {
-      return;
-    }
-
-    function updateRoute() {
-      if (!map.current || !map.current.isStyleLoaded()) return;
-
-      // Create the great circle route
-      const routeGeoJSON = createGreatCircleGeoJSON(parsedFrom, parsedTo);
-
-      console.log('Route coordinates:', routeGeoJSON.geometry.coordinates.slice(0, 5), '...', routeGeoJSON.geometry.coordinates.slice(-5));
-
-      // Create marker points
-      const markersGeoJSON = {
-        type: 'FeatureCollection' as const,
-        features: [
-          {
-            type: 'Feature' as const,
-            geometry: {
-              type: 'Point' as const,
-              coordinates: parsedFrom
-            },
-            properties: { type: 'start' }
-          },
-          {
-            type: 'Feature' as const,
-            geometry: {
-              type: 'Point' as const,
-              coordinates: parsedTo
-            },
-            properties: { type: 'end' }
-          }
-        ]
-      };
-
-      // Update the sources
-      const routeSource = map.current.getSource('route') as mapboxgl.GeoJSONSource;
-      const markersSource = map.current.getSource('markers') as mapboxgl.GeoJSONSource;
-
-      if (routeSource) {
-        routeSource.setData({
-          type: 'FeatureCollection',
-          features: [routeGeoJSON]
-        });
-      }
-
-      if (markersSource) {
-        markersSource.setData(markersGeoJSON);
-      }
-
-      // Fit bounds to show the entire route
-      const bounds = new mapboxgl.LngLatBounds();
-      routeGeoJSON.geometry.coordinates.forEach((coord: [number, number]) => {
-        bounds.extend(coord);
-      });
-
-      map.current.fitBounds(bounds, {
-        padding: 50,
-        maxZoom: 6
-      });
-    }
-
-    // Update route when map is loaded and coordinates are valid
-    if (map.current.isStyleLoaded()) {
-      updateRoute();
-    } else {
-      map.current.on('load', updateRoute);
-    }
-  }, [parsedFrom, parsedTo]);
-
-  if (
-    !isValidCoord(parsedFrom) ||
-    !isValidCoord(parsedTo) ||
-    (parsedFrom[0] === 0 && parsedFrom[1] === 0 && parsedTo[0] === 0 && parsedTo[1] === 0)
-  ) {
+  // Show placeholder if no valid coordinates
+  if (!fromCoords || !toCoords ||
+    fromCoords[0] === 0 || fromCoords[1] === 0 ||
+    toCoords[0] === 0 || toCoords[1] === 0) {
     return (
       <div className="w-full h-[400px] bg-gray-100 flex items-center justify-center text-gray-400">
         No route to display
@@ -284,10 +179,8 @@ export default function MapArcs({ from, to }: Props) {
   }
 
   return (
-    <div
-      ref={mapContainer}
-      className="w-full h-[400px] rounded-lg"
-      style={{ height: '400px' }}
-    />
+    <div className="w-full h-[400px] bg-gray-200 border rounded-lg overflow-hidden">
+      <div ref={mapContainer} className="w-full h-full" />
+    </div>
   );
 }
