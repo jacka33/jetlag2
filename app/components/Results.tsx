@@ -1,6 +1,9 @@
 'use client';
 import { useAppSelector } from '../redux/hooks';
-import MapArcs from './Map';
+import dynamic from 'next/dynamic';
+
+// Dynamically import MapboxMap to avoid SSR issues
+const MapboxMap = dynamic(() => import('./MapboxMap'), { ssr: false });
 
 export default function Results() {
 
@@ -17,7 +20,7 @@ export default function Results() {
         </p>
       </div>
       <div>
-        <MapArcs from={useAppSelector((state) => (state.flight.depCoords))} to={useAppSelector((state) => (state.flight.arrCoords))} />
+        <MapboxMap from={useAppSelector((state) => (state.flight.depCoords))} to={useAppSelector((state) => (state.flight.arrCoords))} />
       </div>
     </div>
 
