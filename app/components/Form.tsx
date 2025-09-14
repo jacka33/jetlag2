@@ -120,6 +120,16 @@ export default function Form({ airports }: { airports: Airport[] }) {
     reset();
     setQuery('');
     setArrivalQuery('');
+
+    // Clear all flight data from Redux
+    dispatch(setDeparture(undefined));
+    dispatch(setArrival(undefined));
+    dispatch(setDistance(0));
+    dispatch(setTime(0));
+    dispatch(setDepCoords([0, 0]));
+    dispatch(setArrCoords([0, 0]));
+    dispatch(setDirection(''));
+    dispatch(setDepartureDateTime(''));
   };
 
   return (
@@ -274,7 +284,7 @@ export default function Form({ airports }: { airports: Airport[] }) {
           </div>
           <div className="mt-6 flex items-center justify-end gap-x-6">
             <button onClick={clearForm} type="button" className="cursor-pointer text-sm/6 font-semibold text-gray-900 dark:text-white">
-              Clear form
+              Clear form and results
             </button>
             <button
               type="submit"

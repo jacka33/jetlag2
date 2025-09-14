@@ -28,6 +28,8 @@ export default function Results() {
   useEffect(() => {
     if (departure && arrival) {
       setHasFormData(true);
+    } else {
+      setHasFormData(false);
     }
   }, [departure, arrival]);
 
