@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useAppSelector } from '../redux/hooks';
-import { selectDepCoords, selectArrCoords } from '../redux/flightSlice';
+import { selectDeparture, selectArrival } from '../redux/flightSlice';
 
 type Props = {
   from?: [number, number]; // [longitude, latitude]
@@ -11,7 +11,7 @@ type Props = {
 };
 
 // TODO: Handle antimeridian crossing
-function createGeometry(from, to) {
+function createGeometry(from: [number, number], to: [number, number]) {
 
   // If the absolute difference in longitude is greater than 180 degrees,
   // the shortest path crosses the antimeridian
@@ -49,23 +49,15 @@ export default function MapArcs({ from, to }: Props) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
 
-  // Get coordinates from Redux store
-  const depCoords = useAppSelector(selectDepCoords);
-  const arrCoords = useAppSelector(selectArrCoords);
-
-  // Use props if provided, otherwise use Redux store
-  const fromCoords = from || depCoords;
-  const toCoords = to || arrCoords;
-
-  console.log('MapArcs coords:', { fromCoords, toCoords });
+  console.log('MapArcs coords:', { from, to });
 
   useEffect(() => {
     if (!mapContainer.current) return;
 
     // Simple validation
-    if (!fromCoords || !toCoords ||
-      fromCoords[0] === 0 || fromCoords[1] === 0 ||
-      toCoords[0] === 0 || toCoords[1] === 0) {
+    if (!from || !to ||
+      from[0] === 0 || from[1] === 0 ||
+      to[0] === 0 || to[1] === 0) {
       console.log('Invalid coordinates, skipping map');
       return;
     }
@@ -86,7 +78,7 @@ export default function MapArcs({ from, to }: Props) {
         container: mapContainer.current,
         projection: 'mercator',
         style: 'mapbox://styles/mapbox/light-v11',
-        center: [(fromCoords[0] + toCoords[0]) / 2, (fromCoords[1] + toCoords[1]) / 2],
+        center: [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2],
         zoom: 2
       });
 
@@ -98,7 +90,7 @@ export default function MapArcs({ from, to }: Props) {
           type: 'geojson',
           data: {
             type: 'Feature',
-            geometry: createGeometry(fromCoords, toCoords),
+            geometry: createGeometry(from, to),
             properties: {}
           }
         });
@@ -123,7 +115,7 @@ export default function MapArcs({ from, to }: Props) {
                 type: 'Feature',
                 geometry: {
                   type: 'Point',
-                  coordinates: fromCoords
+                  coordinates: from
                 },
                 properties: {}
               },
@@ -131,7 +123,7 @@ export default function MapArcs({ from, to }: Props) {
                 type: 'Feature',
                 geometry: {
                   type: 'Point',
-                  coordinates: toCoords
+                  coordinates: to
                 },
                 properties: {}
               }
@@ -153,8 +145,8 @@ export default function MapArcs({ from, to }: Props) {
 
         // Fit to bounds
         const bounds = new mapboxgl.LngLatBounds();
-        bounds.extend(fromCoords);
-        bounds.extend(toCoords);
+        bounds.extend(from);
+        bounds.extend(to);
         map.current.fitBounds(bounds, { padding: 50 });
       });
     }
@@ -165,12 +157,12 @@ export default function MapArcs({ from, to }: Props) {
         map.current = null;
       }
     };
-  }, [fromCoords, toCoords]);
+  }, [from, to]);
 
   // Show placeholder if no valid coordinates
-  if (!fromCoords || !toCoords ||
-    fromCoords[0] === 0 || fromCoords[1] === 0 ||
-    toCoords[0] === 0 || toCoords[1] === 0) {
+  if (!from || !to ||
+    from[0] === 0 || from[1] === 0 ||
+    to[0] === 0 || to[1] === 0) {
     return (
       <div className="w-full h-[400px] bg-gray-100 flex items-center justify-center text-gray-400">
         No route to display

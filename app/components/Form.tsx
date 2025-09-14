@@ -8,7 +8,7 @@ import { z } from "zod"
 import { isValidDateTime } from '../utils/DateTimeValidator';
 import { CalculateDistance, CalculateFlightTime, CalculateDirection } from '../utils/FlightCalculator';
 import { useAppDispatch } from '../redux/hooks';
-import { setDistance, setTime, setDepCoords, setArrCoords, setDirection, setDeparture, setArrival, setDepartureDateTime } from '../redux/flightSlice';
+import { setDistance, setTime, setDirection, setDeparture, setArrival, setDepartureDateTime } from '../redux/flightSlice';
 
 import type { Airport } from '../types';
 
@@ -82,15 +82,13 @@ export default function Form({ airports }: { airports: Airport[] }) {
     //   return;
     // }
 
-    const flightDistance = CalculateDistance(parseFloat(data.departure!.latitude), parseFloat(data.departure!.longitude), parseFloat(data.arrival!.latitude), parseFloat(data.arrival!.longitude));
+    const flightDistance = CalculateDistance(data.departure!.latitude, data.departure!.longitude, data.arrival!.latitude, data.arrival!.longitude);
     const flightTime = CalculateFlightTime(flightDistance); // returns time in whole minutes
-    const flightDirection = CalculateDirection(parseFloat(data.departure!.longitude), parseFloat(data.arrival!.longitude));
+    const flightDirection = CalculateDirection(data.departure!.longitude, data.arrival!.longitude);
 
 
     dispatch(setDistance(flightDistance)); // in nm
     dispatch(setTime(flightTime)); // in minutes
-    dispatch(setDepCoords([parseFloat(data.departure!.longitude), parseFloat(data.departure!.latitude)]));
-    dispatch(setArrCoords([parseFloat(data.arrival!.longitude), parseFloat(data.arrival!.latitude)]));
     dispatch(setDirection(flightDirection));
     dispatch(setDeparture(data.departure!));
     dispatch(setArrival(data.arrival!));
@@ -126,8 +124,6 @@ export default function Form({ airports }: { airports: Airport[] }) {
     dispatch(setArrival(undefined));
     dispatch(setDistance(0));
     dispatch(setTime(0));
-    dispatch(setDepCoords([0, 0]));
-    dispatch(setArrCoords([0, 0]));
     dispatch(setDirection(''));
     dispatch(setDepartureDateTime(''));
   };

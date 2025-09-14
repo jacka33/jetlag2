@@ -21,8 +21,6 @@ export default function Results() {
   const flightTimeMins = useAppSelector((state) => state.flight.time);
   const departure = useAppSelector((state) => state.flight.departure);
   const arrival = useAppSelector((state) => state.flight.arrival);
-  const depCoords = useAppSelector((state) => state.flight.depCoords);
-  const arrCoords = useAppSelector((state) => state.flight.arrCoords);
 
   // Check if form has been submitted
   useEffect(() => {
@@ -76,7 +74,7 @@ export default function Results() {
         </div>
         <div>
           {hasFormData ? (
-            <MapboxMap from={depCoords} to={arrCoords} />
+            <MapboxMap from={[Number(departure?.longitude), Number(departure?.latitude)]} to={[Number(arrival?.longitude), Number(arrival?.latitude)]} />
           ) : (
             <div className="w-full h-[400px] bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-300 border rounded-lg">
               <div className="text-center">

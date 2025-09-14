@@ -6,8 +6,6 @@ import { Airport } from '../types'
 interface FlightState {
   distance: number
   time: number // in minutes
-  depCoords: [number, number] // [long, lat]
-  arrCoords: [number, number] // [long, lat]
   direction: string
   departure: Airport | undefined
   arrival: Airport | undefined
@@ -18,8 +16,6 @@ interface FlightState {
 const initialState: FlightState = {
   distance: 0,
   time: 0,
-  depCoords: [0, 0],
-  arrCoords: [0, 0],
   direction: "",
   departure: undefined,
   arrival: undefined,
@@ -37,12 +33,6 @@ export const flightSlice = createSlice({
     setTime: (state, action: PayloadAction<number>) => {
       state.time = action.payload
     },
-    setDepCoords: (state, action: PayloadAction<[number, number]>) => {
-      state.depCoords = action.payload
-    },
-    setArrCoords: (state, action: PayloadAction<[number, number]>) => {
-      state.arrCoords = action.payload
-    },
     setDirection: (state, action: PayloadAction<string>) => {
       state.direction = action.payload
     },
@@ -58,13 +48,11 @@ export const flightSlice = createSlice({
   },
 })
 
-export const { setDistance, setTime, setDepCoords, setArrCoords, setDirection, setDeparture, setArrival, setDepartureDateTime } = flightSlice.actions
+export const { setDistance, setTime, setDirection, setDeparture, setArrival, setDepartureDateTime } = flightSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectFlightDistance = (state: RootState) => state.flight.distance
 export const selectFlightTime = (state: RootState) => state.flight.time
-export const selectDepCoords = (state: RootState) => state.flight.depCoords
-export const selectArrCoords = (state: RootState) => state.flight.arrCoords
 export const selectDirection = (state: RootState) => state.flight.direction
 export const selectDeparture = (state: RootState) => state.flight.departure
 export const selectArrival = (state: RootState) => state.flight.arrival
