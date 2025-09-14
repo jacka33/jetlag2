@@ -4,13 +4,15 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { useState } from 'react'
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
+import { z } from "zod"
 import { isValidDateTime } from '../utils/DateTimeValidator';
 import { CalculateDistance, CalculateFlightTime, CalculateDirection } from '../utils/FlightCalculator';
 import { useAppDispatch } from '../redux/hooks';
-import { setDistance, setTime, setDepCoords, setArrCoords, setDirection } from '../redux/flightSlice';
+import { setDistance, setTime, setDepCoords, setArrCoords, setDirection, setDeparture, setArrival, setDepartureDateTime } from '../redux/flightSlice';
 
-const AirportSchema = z.object({
+import type { Airport } from '../types';
+
+export const AirportSchema = z.object({
   code: z.string(),
   icao: z.string().nullable(),
   name: z.string(),
@@ -27,7 +29,6 @@ const AirportSchema = z.object({
   type: z.string().nullable(),
 });
 
-type Airport = z.infer<typeof AirportSchema>;
 
 export default function Form({ airports }: { airports: Airport[] }) {
   const [query, setQuery] = useState('');
@@ -91,6 +92,9 @@ export default function Form({ airports }: { airports: Airport[] }) {
     dispatch(setDepCoords([parseFloat(data.departure!.longitude), parseFloat(data.departure!.latitude)]));
     dispatch(setArrCoords([parseFloat(data.arrival!.longitude), parseFloat(data.arrival!.latitude)]));
     dispatch(setDirection(flightDirection));
+    dispatch(setDeparture(data.departure!));
+    dispatch(setArrival(data.arrival!));
+    dispatch(setDepartureDateTime(data.departureDateTime));
 
     console.log(data);
 
@@ -270,7 +274,7 @@ export default function Form({ airports }: { airports: Airport[] }) {
           </div>
           <div className="mt-6 flex items-center justify-end gap-x-6">
             <button onClick={clearForm} type="button" className="cursor-pointer text-sm/6 font-semibold text-gray-900 dark:text-white">
-              Clear
+              Clear form
             </button>
             <button
               type="submit"
