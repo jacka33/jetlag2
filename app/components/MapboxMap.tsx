@@ -84,7 +84,7 @@ export default function MapArcs({ from, to }: Props) {
 
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        projection: 'rectangular',
+        projection: 'mercator',
         style: 'mapbox://styles/mapbox/light-v11',
         center: [(fromCoords[0] + toCoords[0]) / 2, (fromCoords[1] + toCoords[1]) / 2],
         zoom: 2
