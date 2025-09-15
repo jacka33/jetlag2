@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '../redux/hooks';
 import { DateTime } from 'luxon';
-import ResultsStickyNav from './ResultsStickyNav';
+import ResultsStickyNav from './results/ResultsStickyNav';
 import Overview from './results/Overview';
 
 export default function Results() {
