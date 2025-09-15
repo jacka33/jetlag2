@@ -20,7 +20,7 @@ export default function Overview({ hasFormData, distance, flightTimeMins, direct
   const toCoords = arrival ? [parseFloat(arrival.longitude), parseFloat(arrival.latitude)] : [0, 0];
 
   // get local arrival time from timeDifference.arrISO
-  const arrLocalTime = timeDifference?.arrISO ? DateTime.fromISO(timeDifference.arrISO).toFormat("HH:mm") : null;
+  const arrLocalTime = timeDifference?.arrISO ? DateTime.fromISO(timeDifference.arrISO, { zone: arrival?.time_zone }).toFormat("HH:mm") : null;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-12 border-b border-gray-900/10 py-12 dark:border-white/10" id="results">
@@ -68,4 +68,5 @@ export default function Overview({ hasFormData, distance, flightTimeMins, direct
         )}
       </div>
     </div>
-  )};
+  )
+};
