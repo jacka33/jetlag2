@@ -21,6 +21,8 @@ export default function LagScoreCalculator() {
 
   return {
     score: 75,
+    scoreColour: "text-yellow-500",
+    iconColour: "bg-yellow-500",
     comment: "Moderate jetlag",
     factors: [
       { name: "Timezone Difference", value: timeDifference && timeDifference?.offset > 0 ? `+${timeDifference?.offset} hours` : `${timeDifference?.offset} hours`, icon: ChevronUpIcon, iconColour: "text-green-500" },
