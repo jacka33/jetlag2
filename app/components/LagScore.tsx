@@ -35,7 +35,7 @@ export default function LagScore() {
               <p className="text-2xl font-semibold text-gray-900 dark:text-white">{item.score}<span className="text-sm">/100</span></p>
               <p className="ml-2 text-medium font-semibold text-gray-700 dark:text-white">{item.comment}</p>
             </dd>
-            <div className="relative mb-8">
+            <div className="relative mb-2">
               {item.factors.map((factor) => (
                 <p className="text-medium font-semibold text-gray-900 dark:text-white" key={factor.name}>
                   {factor.name}: {factor.value}{' '}
@@ -44,7 +44,7 @@ export default function LagScore() {
               ))
               }
             </div>
-            <div className="absolute inset-x-0 bottom-0 bg-gray-50 px-4 py-4 sm:px-6 dark:bg-gray-700/20">
+            <div className="absolute inset-x-0 bottom-0 py-4">
               <div className="text-sm">
                 <a
                   href="#"

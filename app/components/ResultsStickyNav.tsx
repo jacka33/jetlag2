@@ -1,7 +1,7 @@
 import { ChevronDownIcon } from '@heroicons/react/16/solid'
 
 const tabs = [
-  { name: 'General', href: '#', current: true },
+  { name: 'Overview', href: '#', current: true },
   { name: 'Schedule', href: '#', current: false },
   { name: 'Recommendations', href: '#', current: false },
   { name: 'Insights', href: '#', current: false },
