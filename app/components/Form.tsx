@@ -7,8 +7,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { isValidDateTime } from '../utils/DateTimeValidator';
 import { CalculateDistance, CalculateFlightTime, CalculateDirection } from '../utils/FlightCalculator';
+import CalculateTimeDifference from '../utils/TimeDifferenceCalculator';
 import { useAppDispatch } from '../redux/hooks';
-import { setDistance, setTime, setDirection, setDepartureDateTime, setDeparture, setArrival } from '../redux/flightSlice';
+import { setDistance, setTime, setDirection, setDepartureDateTime, setDeparture, setArrival, setTimeDifference } from '../redux/flightSlice';
 
 import type { Airport } from '../types';
 
@@ -85,7 +86,7 @@ export default function Form({ airports }: { airports: Airport[] }) {
     const flightDistance = CalculateDistance(parseFloat(data.departure!.latitude), parseFloat(data.departure!.longitude), parseFloat(data.arrival!.latitude), parseFloat(data.arrival!.longitude));
     const flightTime = CalculateFlightTime(flightDistance); // returns time in whole minutes
     const flightDirection = CalculateDirection(parseFloat(data.departure!.longitude), parseFloat(data.arrival!.longitude));
-
+    const timeDifference = CalculateTimeDifference(data.departure!.time_zone, data.arrival!.time_zone, data.departureDateTime, flightTime);
 
     dispatch(setDistance(flightDistance)); // in nm
     dispatch(setTime(flightTime)); // in minutes
@@ -93,6 +94,7 @@ export default function Form({ airports }: { airports: Airport[] }) {
     dispatch(setDeparture(data.departure!));
     dispatch(setArrival(data.arrival!));
     dispatch(setDepartureDateTime(data.departureDateTime));
+    dispatch(setTimeDifference(timeDifference)); // in hours
 
     console.log(data);
 
@@ -101,16 +103,16 @@ export default function Form({ airports }: { airports: Airport[] }) {
   const filteredAirports = query.length > 0
     ? airports.filter(
       (a) =>
-        a.name.toLowerCase().includes(query.toLowerCase()) ||
-        a.code?.toLowerCase().includes(query.toLowerCase())
+        a?.name.toLowerCase().includes(query.toLowerCase()) ||
+        a?.code.toLowerCase().includes(query.toLowerCase())
     ).slice(0, 10)
     : [];
 
   const filteredArrivalAirports = arrivalQuery.length > 0
     ? airports.filter(
       (a) =>
-        a.name.toLowerCase().includes(arrivalQuery.toLowerCase()) ||
-        a.code?.toLowerCase().includes(arrivalQuery.toLowerCase())
+        a?.name.toLowerCase().includes(arrivalQuery.toLowerCase()) ||
+        a?.code.toLowerCase().includes(arrivalQuery.toLowerCase())
     ).slice(0, 10)
     : [];
 
@@ -120,12 +122,13 @@ export default function Form({ airports }: { airports: Airport[] }) {
     setArrivalQuery('');
 
     // Clear all flight data from Redux
-    dispatch(setDeparture(undefined));
-    dispatch(setArrival(undefined));
+    dispatch(setDeparture(null));
+    dispatch(setArrival(null));
     dispatch(setDistance(0));
     dispatch(setTime(0));
     dispatch(setDirection(''));
     dispatch(setDepartureDateTime(''));
+    dispatch(setTimeDifference(null));
   };
 
   return (
@@ -172,14 +175,14 @@ export default function Form({ airports }: { airports: Airport[] }) {
                         >
                           {filteredAirports.map((ap: Airport) => (
                             <ComboboxOption
-                              key={ap.code}
+                              key={ap?.code}
                               value={ap}
                               className="cursor-default px-3 py-2 text-gray-900 select-none data-focus:bg-indigo-600 data-focus:text-white data-focus:outline-hidden dark:text-white dark:data-focus:bg-indigo-500"
                             >
                               <div className="flex">
-                                <span className="block truncate">{ap?.name} ({ap.country})</span>
+                                <span className="block truncate">{ap?.name} ({ap?.country})</span>
                                 <span className="ml-2 block truncate dark:text-gray-400">
-                                  {ap.code}
+                                  {ap?.code}
                                 </span>
                               </div>
                             </ComboboxOption>
@@ -229,14 +232,14 @@ export default function Form({ airports }: { airports: Airport[] }) {
                         >
                           {filteredArrivalAirports.map((ap) => (
                             <ComboboxOption
-                              key={ap.code}
+                              key={ap?.code}
                               value={ap}
                               className="cursor-default px-3 py-2 text-gray-900 select-none data-focus:bg-indigo-600 data-focus:text-white data-focus:outline-hidden dark:text-white dark:data-focus:bg-indigo-500"
                             >
                               <div className="flex">
-                                <span className="block truncate">{ap?.name} ({ap.country})</span>
+                                <span className="block truncate">{ap?.name} ({ap?.country})</span>
                                 <span className="ml-2 block truncate dark:text-gray-400">
-                                  {ap.code}
+                                  {ap?.code}
                                 </span>
                               </div>
                             </ComboboxOption>

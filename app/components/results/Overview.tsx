@@ -1,4 +1,5 @@
-import type { Airport } from '../../types'
+import { DateTime } from 'luxon'
+import type { Airport, TimeDifference } from '../../types'
 import LagScore from '../LagScore'
 import MapboxMap from '../MapboxMap'
 import Tooltip from '../Tooltip'
@@ -8,7 +9,7 @@ export default function Overview({ hasFormData, distance, flightTimeMins, direct
   distance: number
   flightTimeMins: number
   direction: string
-  timeDifference: { arrDateTimeInArrTZ: any; offset: number } | null
+  timeDifference: TimeDifference | null
   depLocalTime: string
   departure: Airport | undefined
   arrival: Airport | undefined
@@ -18,6 +19,8 @@ export default function Overview({ hasFormData, distance, flightTimeMins, direct
   const fromCoords = departure ? [parseFloat(departure.longitude), parseFloat(departure.latitude)] : [0, 0];
   const toCoords = arrival ? [parseFloat(arrival.longitude), parseFloat(arrival.latitude)] : [0, 0];
 
+  // get local arrival time from timeDifference.arrISO
+  const arrLocalTime = timeDifference?.arrISO ? DateTime.fromISO(timeDifference.arrISO).toFormat("HH:mm") : null;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-12 border-b border-gray-900/10 py-12 dark:border-white/10" id="results">
@@ -35,7 +38,7 @@ export default function Overview({ hasFormData, distance, flightTimeMins, direct
               <div>
                 Direction of travel: {direction}
               </div>
-              <Tooltip text={`Departing from ${departure?.code} at ${depLocalTime}. Arriving at ${timeDifference?.arrDateTimeInArrTZ.toFormat('HH:mm')} local time at ${arrival?.code}.`}>
+              <Tooltip text={`Departing from ${departure?.code} at ${depLocalTime}. Arriving at ${arrLocalTime} local time at ${arrival?.code}.`}>
                 Time difference: {timeDifference ? `${timeDifference.offset > 0 ? `+${timeDifference.offset} hours` : `${timeDifference.offset} hours`}` : 'Calculating...'}
               </Tooltip>
               <LagScore />

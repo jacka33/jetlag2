@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from './store'
-import { Airport } from '../types'
+import { Airport, TimeDifference } from '../types'
 
 // Define a type for the slice state
 interface FlightState {
@@ -10,6 +10,7 @@ interface FlightState {
   departure: Airport | undefined
   arrival: Airport | undefined
   departureDateTime: string // ISO string (local time at departure airport)
+  timeDifference: TimeDifference | null
 }
 
 // Define the initial state using that type
@@ -19,7 +20,8 @@ const initialState: FlightState = {
   direction: "",
   departure: undefined,
   arrival: undefined,
-  departureDateTime: "" // ISO string (local time at departure airport)
+  departureDateTime: "", // ISO string (local time at departure airport)
+  timeDifference: null
 }
 
 export const flightSlice = createSlice({
@@ -43,12 +45,15 @@ export const flightSlice = createSlice({
       state.arrival = action.payload
     },
     setDepartureDateTime: (state, action: PayloadAction<string>) => {
-        state.departureDateTime = action.payload;
-    }
+      state.departureDateTime = action.payload;
+    },
+    setTimeDifference: (state, action: PayloadAction<TimeDifference>) => {
+      state.timeDifference = action.payload
+    },
   },
 })
 
-export const { setDistance, setTime, setDirection, setDeparture, setArrival, setDepartureDateTime } = flightSlice.actions
+export const { setDistance, setTime, setDirection, setDeparture, setArrival, setDepartureDateTime, setTimeDifference } = flightSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectFlightDistance = (state: RootState) => state.flight.distance
@@ -57,6 +62,6 @@ export const selectDirection = (state: RootState) => state.flight.direction
 export const selectDeparture = (state: RootState) => state.flight.departure
 export const selectArrival = (state: RootState) => state.flight.arrival
 export const selectDepartureDateTime = (state: RootState) => state.flight.departureDateTime
-
+export const selectTimeDifference = (state: RootState) => state.flight.timeDifference
 
 export default flightSlice.reducer
