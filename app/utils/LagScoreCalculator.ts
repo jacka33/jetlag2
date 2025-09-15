@@ -7,7 +7,7 @@ export default function LagScoreCalculator() {
     score: 75,
     comment: "Moderate jetlag",
     factors: [
-      { name: "Time Zone Difference", value: timeDifference?.offset > 0 ? `+${timeDifference.offset} hours` : `${timeDifference.offset} hours`, icon: ChevronUpIcon, iconColour: "text-green-500" },
+      { name: "Time Zone Difference", value: timeDifference && timeDifference?.offset > 0 ? `+${timeDifference?.offset} hours` : `${timeDifference?.offset} hours`, icon: ChevronUpIcon, iconColour: "text-green-500" },
       { name: "Flight Duration", value: "8 hours", icon: ChevronDoubleRightIcon, iconColour: "text-gray-500" },
       { name: "Departure Time", value: "Evening", icon: ChevronDoubleDownIcon, iconColour: "text-green-500" },
       { name: "Arrival Time", value: "Morning",   icon: ChevronDoubleUpIcon, iconColour: "text-red-500" },
