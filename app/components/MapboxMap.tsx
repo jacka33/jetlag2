@@ -2,8 +2,6 @@
 import { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useAppSelector } from '../redux/hooks';
-import { selectDeparture, selectArrival } from '../redux/flightSlice';
 
 type Props = {
   from?: [number, number]; // [longitude, latitude]
@@ -12,37 +10,10 @@ type Props = {
 
 // TODO: Handle antimeridian crossing
 function createGeometry(from: [number, number], to: [number, number]) {
-
-  // If the absolute difference in longitude is greater than 180 degrees,
-  // the shortest path crosses the antimeridian
-  const doesCrossAntimeridian = Math.abs(to[0] - from[0]) > 180;
-
-  const geometry = {
-    type: 'LineString',
-    coordinates: [
-      from,
-      to
-    ]
+  return {
+    type: 'LineString' as const,
+    coordinates: [from, to]
   };
-
-  // // To draw a line across the 180th meridian,
-  // // if the longitude of the second point minus
-  // // the longitude of original (or previous) point is >= 180,
-  // // subtract 360 from the longitude of the second point.
-  // // If it is less than 180, add 360 to the second point.
-
-  // if (doesCrossAntimeridian) {
-  //   const startLng = geometry.coordinates[0][0];
-  //   const endLng = geometry.coordinates[1][0];
-
-  //   if (endLng - startLng >= 180) {
-  //     geometry.coordinates[1][0] -= 360;
-  //   } else if (endLng - startLng < 180) {
-  //     geometry.coordinates[1][0] += 360;
-  //   }
-  // }
-
-  return geometry;
 }
 
 export default function MapArcs({ from, to }: Props) {
@@ -54,10 +25,12 @@ export default function MapArcs({ from, to }: Props) {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // Simple validation
-    if (!from || !to ||
-      from[0] === 0 || from[1] === 0 ||
-      to[0] === 0 || to[1] === 0) {
+    // Simple validation with explicit number conversion
+    if (
+      !from || !to ||
+      Number(from[0]) === 0 || Number(from[1]) === 0 ||
+      Number(to[0]) === 0 || Number(to[1]) === 0
+    ) {
       console.log('Invalid coordinates, skipping map');
       return;
     }
@@ -78,7 +51,7 @@ export default function MapArcs({ from, to }: Props) {
         container: mapContainer.current,
         projection: 'mercator',
         style: 'mapbox://styles/mapbox/light-v11',
-        center: [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2],
+        center: [(Number(from[0]) + Number(to[0])) / 2, (Number(from[1]) + Number(to[1])) / 2],
         zoom: 2
       });
 
@@ -115,7 +88,7 @@ export default function MapArcs({ from, to }: Props) {
                 type: 'Feature',
                 geometry: {
                   type: 'Point',
-                  coordinates: from
+                  coordinates: [Number(from[0]), Number(from[1])]
                 },
                 properties: {}
               },
@@ -123,7 +96,7 @@ export default function MapArcs({ from, to }: Props) {
                 type: 'Feature',
                 geometry: {
                   type: 'Point',
-                  coordinates: to
+                  coordinates: [Number(to[0]), Number(to[1])]
                 },
                 properties: {}
               }
@@ -145,8 +118,8 @@ export default function MapArcs({ from, to }: Props) {
 
         // Fit to bounds
         const bounds = new mapboxgl.LngLatBounds();
-        bounds.extend(from);
-        bounds.extend(to);
+        bounds.extend([Number(from[0]), Number(from[1])]);
+        bounds.extend([Number(to[0]), Number(to[1])]);
         map.current.fitBounds(bounds, { padding: 50 });
       });
     }

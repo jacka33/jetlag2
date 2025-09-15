@@ -22,6 +22,10 @@ export default function Results() {
   const departure = useAppSelector((state) => state.flight.departure);
   const arrival = useAppSelector((state) => state.flight.arrival);
 
+  // Extract coordinates from airport objects
+  const fromCoords = departure ? [parseFloat(departure.longitude), parseFloat(departure.latitude)] : [0, 0];
+  const toCoords = arrival ? [parseFloat(arrival.longitude), parseFloat(arrival.latitude)] : [0, 0];
+
   // Check if form has been submitted
   useEffect(() => {
     if (departure && arrival) {
@@ -58,7 +62,7 @@ export default function Results() {
                   Direction of travel: {direction}
                 </div>
                 <Tooltip text={`Departing from ${departure?.code} at ${depLocalTime}. Arriving at ${timeDifference?.arrDateTimeInArrTZ.toFormat('HH:mm')} local time at ${arrival?.code}.`}>
-                  Time difference: {`${timeDifference?.offset > 0 ? `+${timeDifference?.offset} hours` : `${timeDifference?.offset} hours`}`}
+                  Time difference: {timeDifference ? `${timeDifference.offset > 0 ? `+${timeDifference.offset} hours` : `${timeDifference.offset} hours`}` : 'Calculating...'}
                 </Tooltip>
               </>
             ) : (
@@ -74,7 +78,7 @@ export default function Results() {
         </div>
         <div>
           {hasFormData ? (
-            <MapboxMap from={[Number(departure?.longitude), Number(departure?.latitude)]} to={[Number(arrival?.longitude), Number(arrival?.latitude)]} />
+            <MapboxMap from={fromCoords as [number, number]} to={toCoords as [number, number]} />
           ) : (
             <div className="w-full h-[400px] bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-300 border rounded-lg">
               <div className="text-center">

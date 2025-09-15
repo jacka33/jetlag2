@@ -8,7 +8,7 @@ import { z } from "zod"
 import { isValidDateTime } from '../utils/DateTimeValidator';
 import { CalculateDistance, CalculateFlightTime, CalculateDirection } from '../utils/FlightCalculator';
 import { useAppDispatch } from '../redux/hooks';
-import { setDistance, setTime, setDirection, setDeparture, setArrival, setDepartureDateTime } from '../redux/flightSlice';
+import { setDistance, setTime, setDirection, setDepartureDateTime, setDeparture, setArrival } from '../redux/flightSlice';
 
 import type { Airport } from '../types';
 
@@ -82,9 +82,9 @@ export default function Form({ airports }: { airports: Airport[] }) {
     //   return;
     // }
 
-    const flightDistance = CalculateDistance(data.departure!.latitude, data.departure!.longitude, data.arrival!.latitude, data.arrival!.longitude);
+    const flightDistance = CalculateDistance(parseFloat(data.departure!.latitude), parseFloat(data.departure!.longitude), parseFloat(data.arrival!.latitude), parseFloat(data.arrival!.longitude));
     const flightTime = CalculateFlightTime(flightDistance); // returns time in whole minutes
-    const flightDirection = CalculateDirection(data.departure!.longitude, data.arrival!.longitude);
+    const flightDirection = CalculateDirection(parseFloat(data.departure!.longitude), parseFloat(data.arrival!.longitude));
 
 
     dispatch(setDistance(flightDistance)); // in nm
