@@ -6,6 +6,7 @@ import Tooltip from './Tooltip';
 import dynamic from 'next/dynamic';
 import { DateTime } from 'luxon';
 import ResultsStickyNav from './ResultsStickyNav';
+import LagScore from './LagScore';
 
 // Dynamically import MapboxMap to avoid SSR issues
 const MapboxMap = dynamic(() => import('./MapboxMap'), { ssr: false });
@@ -46,9 +47,9 @@ export default function Results() {
   return (
     <>
       <ResultsStickyNav />
-      <div className="grid grid-cols-1 sm:grid-cols-2 border-b border-gray-900/10 py-12 dark:border-white/10" id="results">
+      <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-12 border-b border-gray-900/10 py-12 dark:border-white/10" id="results">
         <div>
-          <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">Jetlag schedule</h2>
+          <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">General overview</h2>
           <div className="mt-1 space-y-2 text-sm/6 text-gray-600 dark:text-gray-400">
             {hasFormData ? (
               <>
@@ -64,6 +65,7 @@ export default function Results() {
                 <Tooltip text={`Departing from ${departure?.code} at ${depLocalTime}. Arriving at ${timeDifference?.arrDateTimeInArrTZ.toFormat('HH:mm')} local time at ${arrival?.code}.`}>
                   Time difference: {timeDifference ? `${timeDifference.offset > 0 ? `+${timeDifference.offset} hours` : `${timeDifference.offset} hours`}` : 'Calculating...'}
                 </Tooltip>
+                <LagScore />
               </>
             ) : (
               <div className="space-y-2">
