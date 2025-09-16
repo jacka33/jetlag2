@@ -12,17 +12,17 @@ export default function LagScore() {
           className="relative overflow-hidden pt-5 pb-12 sm:pt-6"
         >
           <dt>
-            <div className={`absolute rounded-md ${stats.iconColour} p-3`}>
+            <div className={`absolute rounded-md ${stats?.iconColour} p-3`}>
               <MoonIcon aria-hidden="true" className="size-6 text-white" />
             </div>
             <p className="ml-16 truncate text-sm font-medium text-black dark:text-white">LagScore <span className='text-xs text-gray-400'>(Lower is better)</span></p>
           </dt>
           <dd className="ml-16 flex items-baseline pb-4 sm:pb-4">
-            <p className={`${stats.scoreColour} text-2xl font-semibold`}>{stats.score}<span className="text-sm text-gray-400">/100</span></p>
-            <p className={`ml-2 text-medium font-semibold ${stats.scoreColour}`}>{stats.comment}</p>
+            <p className={`${stats?.scoreColour} text-2xl font-semibold`}>{stats?.score}<span className="text-sm text-gray-400">/100</span></p>
+            <p className={`ml-2 text-medium font-semibold ${stats?.scoreColour}`}>{stats?.comment}</p>
           </dd>
           <div className="relative mb-2">
-            {stats.factors.map((factor) => (
+            {stats?.factors.map((factor) => (
               <p className="text-medium font-semibold text-gray-900 dark:text-white" key={factor.name}>
                 {factor.name}: {factor.value}{' '}
                 <factor.icon aria-hidden="true" className={`inline size-4 ${factor.iconColour || ''}`} />
