@@ -4,9 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "start": "next start",
-    "vercel-build": "npm install --legacy-peer-deps && next build"
+    "build": "npm install --legacy-peer-deps && next build --turbopack",
+    "start": "next start"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",
