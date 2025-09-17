@@ -13,8 +13,7 @@ export default function CalendarWeekView({ usualSchedule }: { usualSchedule: Usu
   const departure = useAppSelector((state: RootState) => state.flight.departure);
 
   const flightEvent: CalendarEvent[] = splitMultiDayEvent(DateTime.fromISO(depDateTime, { zone: departure?.time_zone }), DateTime.fromISO(depDateTime, { zone: departure?.time_zone }).plus({ minutes: flightTime || 0 }), 'Flight');
-  const isSplitDay = flightEvent.length > 1;
-
+  // todo: button to switch calendar view between departure / arrival timezones
   return (
     <div className="flex h-full flex-col">
       <header className="flex flex-none items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-white/15 dark:bg-gray-800/50">
@@ -246,7 +245,7 @@ export default function CalendarWeekView({ usualSchedule }: { usualSchedule: Usu
                     style={{ gridRow: event.gridRow }}
                     // col-start-4 as default - this is always flight day
                     // if the index of the map element is not 0, it must be a split day flight, so set col-start-5 for the second split (+ 1 day)
-                    className={`relative mt-px flex ${index === 0 ? "sm:col-start-4" : "sm:col-start-5"} sm:col-start-4 dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900`}
+                    className={`relative mt-px flex ${index === 0 ? "sm:col-start-4" : "sm:col-start-5"} dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900`}
                   >
                     <a
                       href="#"
