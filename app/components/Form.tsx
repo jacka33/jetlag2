@@ -9,7 +9,7 @@ import { isValidDateTime } from '../utils/DateTimeValidator';
 import { CalculateDistance, CalculateFlightTime, CalculateDirection } from '../utils/FlightCalculator';
 import CalculateTimeDifference from '../utils/TimeDifferenceCalculator';
 import { useAppDispatch } from '../redux/hooks';
-import { setDistance, setTime, setDirection, setDepartureDateTime, setDeparture, setArrival, setTimeDifference } from '../redux/flightSlice';
+import { setDistance, setTime, setDirection, setDepartureDateTime, setDeparture, setArrival, setTimeDifference, setFormSubmitted } from '../redux/flightSlice';
 
 import type { Airport } from '../types';
 import { DateTime } from 'luxon';
@@ -54,7 +54,7 @@ export default function Form({ airports }: { airports: Airport[] }) {
     departureDateTime: z.string().refine(
       (val) => {
         const dt = DateTime.fromISO(val);
-        return dt.isValid && val === dt.toISO(); // Ensure it's a valid ISO string
+        return dt.isValid;
       },
       { message: "Invalid date/time" }
     ),
@@ -102,6 +102,7 @@ export default function Form({ airports }: { airports: Airport[] }) {
     dispatch(setArrival(data.arrival!));
     dispatch(setDepartureDateTime(data.departureDateTime));
     dispatch(setTimeDifference(timeDifference)); // in hours
+    dispatch(setFormSubmitted(true)); // Mark form as submitted
 
     console.log(data);
 
@@ -136,6 +137,7 @@ export default function Form({ airports }: { airports: Airport[] }) {
     dispatch(setDirection(''));
     dispatch(setDepartureDateTime(''));
     dispatch(setTimeDifference(null));
+    dispatch(setFormSubmitted(false)); // Mark form as not submitted
   };
 
   return (

@@ -11,6 +11,7 @@ interface FlightState {
   arrival: Airport | undefined
   departureDateTime: string // ISO string (local time at departure airport)
   timeDifference: TimeDifference | null
+  formSubmitted: boolean
 }
 
 // Define the initial state using that type
@@ -21,7 +22,8 @@ const initialState: FlightState = {
   departure: undefined,
   arrival: undefined,
   departureDateTime: "", // ISO string (local time at departure airport)
-  timeDifference: null
+  timeDifference: null,
+  formSubmitted: false
 }
 
 export const flightSlice = createSlice({
@@ -50,10 +52,13 @@ export const flightSlice = createSlice({
     setTimeDifference: (state, action: PayloadAction<TimeDifference>) => {
       state.timeDifference = action.payload
     },
+    setFormSubmitted: (state, action: PayloadAction<boolean>) => {
+      state.formSubmitted = action.payload
+    },
   },
 })
 
-export const { setDistance, setTime, setDirection, setDeparture, setArrival, setDepartureDateTime, setTimeDifference } = flightSlice.actions
+export const { setDistance, setTime, setDirection, setDeparture, setArrival, setDepartureDateTime, setTimeDifference, setFormSubmitted } = flightSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectFlightDistance = (state: RootState) => state.flight.distance

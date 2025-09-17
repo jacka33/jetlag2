@@ -15,7 +15,7 @@ const fetcher = async (url: string, body: PromptProps) => {
 
 export default function InsightsClient(props: PromptProps) {
   const { data, error, isLoading } = useSWR([
-    "/api/insights/route",
+    "/api/insights",
     props
   ], ([url, body]) => fetcher(url, body), {
     revalidateOnFocus: false,
