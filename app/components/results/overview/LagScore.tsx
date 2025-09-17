@@ -1,5 +1,5 @@
 import { MoonIcon } from '@heroicons/react/24/outline'
-import LagScoreCalculator from '../../utils/LagScoreCalculator'
+import LagScoreCalculator from '../../../utils/LagScoreCalculator'
 
 export default function LagScore() {
   const stats = LagScoreCalculator();

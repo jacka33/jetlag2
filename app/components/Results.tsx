@@ -2,8 +2,10 @@
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '../redux/hooks';
 import { DateTime } from 'luxon';
-import ResultsStickyNav from './results/ResultsStickyNav';
+import ResultsStickyNav from './results/nav/ResultsStickyNav';
 import Overview from './results/Overview';
+import SleepScheduleCalculator from '../utils/SleepScheduleCalculator';
+import Calendars from './results/Calendars';
 
 export default function Results() {
   const [hasFormData, setHasFormData] = useState(false);
@@ -41,6 +43,7 @@ export default function Results() {
         departure={departure}
         arrival={arrival}
       />
+      <Calendars hasFormData={hasFormData} usualSchedule={SleepScheduleCalculator()} />
     </>
   )
 }

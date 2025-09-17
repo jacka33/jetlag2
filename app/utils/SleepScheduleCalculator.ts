@@ -2,6 +2,7 @@ import { DateTime } from "luxon";
 import { useAppSelector } from "../redux/hooks";
 import type { RootState } from "../redux/store";
 
+// TODO: return two schedules - usual and adjusted
 export default function SleepScheduleCalculator() {
 
   const timeDifference = useAppSelector((state: RootState) => state.flight.timeDifference);
