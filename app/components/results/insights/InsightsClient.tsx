@@ -27,5 +27,6 @@ export default function InsightsClient(props: PromptProps) {
   if (error) return <div>Error: {error.message}</div>;
   if (!data) return null;
 
+  // @ts-expect-error: dont know openai types yet
   return <Insights response={data.response} />;
 }
