@@ -3,8 +3,6 @@ import LagScoreCalculator from '../../utils/LagScoreCalculator'
 
 export default function LagScore() {
   const stats = LagScoreCalculator();
-
-  //todo: modal to add more personalisation
   return (
     <div>
       <dl className="mt-5 gap-5">
