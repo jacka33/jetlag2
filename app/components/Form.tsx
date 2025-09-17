@@ -12,6 +12,7 @@ import { useAppDispatch } from '../redux/hooks';
 import { setDistance, setTime, setDirection, setDepartureDateTime, setDeparture, setArrival, setTimeDifference } from '../redux/flightSlice';
 
 import type { Airport } from '../types';
+import { DateTime } from 'luxon';
 
 export const AirportSchema = z.object({
   code: z.string(),
@@ -50,7 +51,13 @@ export default function Form({ airports }: { airports: Airport[] }) {
       (val) => !!val && !!val.code,
       { message: "Choose an arrival airport" }
     ),
-    departureDateTime: z.iso.datetime({ local: true, error: "Invalid date/time" }),
+    departureDateTime: z.string().refine(
+      (val) => {
+        const dt = DateTime.fromISO(val);
+        return dt.isValid && val === dt.toISO(); // Ensure it's a valid ISO string
+      },
+      { message: "Invalid date/time" }
+    ),
   });
 
   type FormData = z.infer<typeof formSchema>;
