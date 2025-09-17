@@ -22,3 +22,22 @@ export type CalendarEvent = {
   startISO: string;
   endISO: string;
 }
+
+export type PromptProps = {
+  departure_airport: string;
+  arrival_airport: string;
+  timezone_difference: number;
+  direction: string;
+  departure_time: string;
+  arrival_time: string;
+  flight_duration_minutes: number;
+  usual_sleep_time: string;
+  usual_wake_time: string;
+  dlmo: string;
+  core_temp_nadir: string;
+  age: number;
+  dep_sunrise: string;
+  dep_sunset: string;
+  arr_sunrise: string;
+  arr_sunset: string;
+};
