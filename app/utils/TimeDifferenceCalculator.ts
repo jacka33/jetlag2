@@ -18,7 +18,7 @@ export default function CalculateTimeDifference(fromTZ: string, toTZ: string, de
   const timeDifference = arrDateTimeInArrTZ.offset - depDateTime.offset; // in minutes
   const offset = timeDifference / 60; // convert to hours
 
-  const arrISO = arrDateTimeInArrTZ.toISO();
+  const arrISO = arrDateTimeInArrTZ.toISO() ?? "";
   
   return {
     arrISO,

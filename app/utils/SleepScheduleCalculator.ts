@@ -6,10 +6,7 @@ import { UsualSchedule } from "../types";
 // TODO: return two schedules - usual and adjusted
 export default function SleepScheduleCalculator(): UsualSchedule[] {
 
-  const timeDifference = useAppSelector((state: RootState) => state.flight.timeDifference);
-  const direction = useAppSelector((state: RootState) => state.flight.direction);
   const depDateTime = useAppSelector((state: RootState) => state.flight.departureDateTime);
-  const flightTime = useAppSelector((state: RootState) => state.flight.time);
   const departure = useAppSelector((state: RootState) => state.flight.departure);
 
   // Set user's routine sleep times (todo: make user configurable)
