@@ -1,11 +1,15 @@
+import { UsualSchedule } from "@/app/types";
 import CalendarWeekView from "./calendar/CalendarWeekView";
+import SleepScheduleCalculator from "@/app/utils/SleepScheduleCalculator";
 
 interface CalendarsProps {
   hasFormData: boolean;
-  usualSchedule: any; // todo: replace
+  usualSchedule: UsualSchedule[];
 }
 
-export default function Calendars({ hasFormData, usualSchedule }: CalendarsProps) {
+export default function Calendars({ hasFormData }: CalendarsProps) {
+
+  const usualSchedule = SleepScheduleCalculator();
   return (
     <div className="w-full">
       {hasFormData ? (

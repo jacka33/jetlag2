@@ -1,9 +1,10 @@
 import { DateTime } from "luxon";
 import { useAppSelector } from "../redux/hooks";
 import type { RootState } from "../redux/store";
+import { UsualSchedule } from "../types";
 
 // TODO: return two schedules - usual and adjusted
-export default function SleepScheduleCalculator() {
+export default function SleepScheduleCalculator(): UsualSchedule[] {
 
   const timeDifference = useAppSelector((state: RootState) => state.flight.timeDifference);
   const direction = useAppSelector((state: RootState) => state.flight.direction);
@@ -37,17 +38,17 @@ export default function SleepScheduleCalculator() {
     // These values allow us to establish the user's default circadian rhythm
     const dlmo = sleepTime.minus({ hours: 2 });
     const ctn = wakeTime.minus({ hours: 2 });
+
     usualSchedule.push({
-      day: i,
+      relativeDay: i,
+      day: day,
       sleep: sleepTime,
       wake: wakeTime,
       dlmo: dlmo,
       ctn: ctn
     });
   }
-  return {
-    usualSchedule: usualSchedule
-  };
+  return usualSchedule;
 
 
 

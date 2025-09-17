@@ -3,8 +3,9 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { DateTime } from 'luxon'
 import { useAppSelector } from '@/app/redux/hooks';
 import type { RootState } from '@/app/redux/store';
+import { UsualSchedule } from '@/app/types';
 
-export default function CalendarWeekView({ usualSchedule }) {
+export default function CalendarWeekView({ usualSchedule }: { usualSchedule: UsualSchedule[] }) {
 
   const depDateTime = useAppSelector((state: RootState) => state.flight.departureDateTime);
   const flightTime = useAppSelector((state: RootState) => state.flight.time);
@@ -22,99 +23,46 @@ export default function CalendarWeekView({ usualSchedule }) {
         <div style={{ width: '165%' }} className="flex max-w-full flex-none flex-col sm:max-w-none md:max-w-full">
           <div className="sticky top-0 z-30 flex-none bg-white shadow-sm ring-1 ring-black/5 sm:pr-8 dark:bg-gray-900 dark:shadow-none dark:ring-white/20">
             <div className="grid grid-cols-7 text-sm/6 text-gray-500 sm:hidden dark:text-gray-400">
-              <button type="button" className="flex flex-col items-center pt-2 pb-3">
-                M{' '}
-                <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900 dark:text-white">
-                  10
-                </span>
-              </button>
-              <button type="button" className="flex flex-col items-center pt-2 pb-3">
-                T{' '}
-                <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900 dark:text-white">
-                  11
-                </span>
-              </button>
-              <button type="button" className="flex flex-col items-center pt-2 pb-3">
-                W{' '}
-                <span className="mt-1 flex size-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white dark:bg-indigo-500">
-                  12
-                </span>
-              </button>
-              <button type="button" className="flex flex-col items-center pt-2 pb-3">
-                T{' '}
-                <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900 dark:text-white">
-                  13
-                </span>
-              </button>
-              <button type="button" className="flex flex-col items-center pt-2 pb-3">
-                F{' '}
-                <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900 dark:text-white">
-                  14
-                </span>
-              </button>
-              <button type="button" className="flex flex-col items-center pt-2 pb-3">
-                S{' '}
-                <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900 dark:text-white">
-                  15
-                </span>
-              </button>
-              <button type="button" className="flex flex-col items-center pt-2 pb-3">
-                S{' '}
-                <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900 dark:text-white">
-                  16
-                </span>
-              </button>
+              {usualSchedule.map((day) => (
+                <button key={day.relativeDay} type="button" className="flex flex-col items-center pt-2 pb-3">
+                  {day.day.toFormat("dd LLL")}{' '}
+                  <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900 dark:text-white">
+                    {day.day.toFormat("ccc")}
+                  </span>
+                </button>
+              ))}
+
             </div>
 
             <div className="-mr-px hidden grid-cols-7 divide-x divide-gray-100 border-r border-gray-100 text-sm/6 text-gray-500 sm:grid dark:divide-white/10 dark:border-white/10 dark:text-gray-400">
               <div className="col-end-1 w-14" />
-              <div className="flex items-center justify-center py-3">
-                <span>
-                  Mon{' '}
-                  <span className="items-center justify-center font-semibold text-gray-900 dark:text-white">10</span>
-                </span>
-              </div>
-              <div className="flex items-center justify-center py-3">
-                <span>
-                  Tue{' '}
-                  <span className="items-center justify-center font-semibold text-gray-900 dark:text-white">11</span>
-                </span>
-              </div>
-              <div className="flex items-center justify-center py-3">
-                <span>
-                  Wed{' '}
-                  <span className="items-center justify-center font-semibold text-gray-900 dark:text-white">13</span>
+              {usualSchedule.map((day) => {
+                if (day.relativeDay != 0) {
+                  return (
+                    <div key={day.relativeDay} className="flex items-center justify-center py-3">
+                      <span>
+                        {day.day.toFormat("ccc")}{' '}
+                        <span className="items-center justify-center font-semibold text-gray-900 dark:text-white">{day.day.toFormat("dd")}</span>
+                      </span>
+                    </div>
+                  )
+                } else {
+                  return (
+                    <div key={day.relativeDay} className="flex items-center justify-center py-3">
+                      <span className="flex items-baseline">
+                        {day.day.toFormat("ccc")}{' '}
+                        <span className="ml-1.5 items-center justify-center font-semibold text-gray-900 dark:text-white">{day.day.toFormat("dd")}</span>
 
-                </span>
-              </div>
-              <div className="flex items-center justify-center py-3">
-                <span className="flex items-baseline">
-                  Thu{' '}
-                  <span className="ml-1.5 items-center justify-center font-semibold text-gray-900 dark:text-white">13</span>
+                        <span className="ml-1.5 flex size-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white dark:bg-indigo-500">
+                          Fly
+                        </span>
+                      </span>
+                    </div>
+                  )
+                }
+              })
+              }
 
-                  <span className="ml-1.5 flex size-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white dark:bg-indigo-500">
-                    Fly
-                  </span>
-                </span>
-              </div>
-              <div className="flex items-center justify-center py-3">
-                <span>
-                  Fri{' '}
-                  <span className="items-center justify-center font-semibold text-gray-900 dark:text-white">14</span>
-                </span>
-              </div>
-              <div className="flex items-center justify-center py-3">
-                <span>
-                  Sat{' '}
-                  <span className="items-center justify-center font-semibold text-gray-900 dark:text-white">15</span>
-                </span>
-              </div>
-              <div className="flex items-center justify-center py-3">
-                <span>
-                  Sun{' '}
-                  <span className="items-center justify-center font-semibold text-gray-900 dark:text-white">16</span>
-                </span>
-              </div>
             </div>
           </div>
           <div className="flex flex-auto">
