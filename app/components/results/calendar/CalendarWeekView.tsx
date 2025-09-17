@@ -3,7 +3,8 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { DateTime } from 'luxon'
 import { useAppSelector } from '@/app/redux/hooks';
 import type { RootState } from '@/app/redux/store';
-import { UsualSchedule } from '@/app/types';
+import { CalendarEvent, UsualSchedule } from '@/app/types';
+import splitMultiDayEvent from '@/app/utils/CalendarEventMaker';
 
 export default function CalendarWeekView({ usualSchedule }: { usualSchedule: UsualSchedule[] }) {
 
@@ -11,6 +12,8 @@ export default function CalendarWeekView({ usualSchedule }: { usualSchedule: Usu
   const flightTime = useAppSelector((state: RootState) => state.flight.time);
   const departure = useAppSelector((state: RootState) => state.flight.departure);
 
+  const flightEvent: CalendarEvent[] = splitMultiDayEvent(DateTime.fromISO(depDateTime, { zone: departure?.time_zone }), DateTime.fromISO(depDateTime, { zone: departure?.time_zone }).plus({ minutes: flightTime || 0 }), 'Flight');
+  const isSplitDay = flightEvent.length > 1;
 
   return (
     <div className="flex h-full flex-col">
@@ -70,7 +73,7 @@ export default function CalendarWeekView({ usualSchedule }: { usualSchedule: Usu
             <div className="grid flex-auto grid-cols-1 grid-rows-1">
               {/* Horizontal lines */}
               <div
-                style={{ gridTemplateRows: 'repeat(48, minmax(3.5rem, 1fr))' }}
+                style={{ gridTemplateRows: 'repeat(48, minmax(1rem, 1fr))' }}
                 className="col-start-1 col-end-2 row-start-1 grid divide-y divide-gray-100 dark:divide-white/5"
               >
                 <div className="row-end-1 h-7" />
@@ -234,53 +237,29 @@ export default function CalendarWeekView({ usualSchedule }: { usualSchedule: Usu
 
               {/* Events */}
               <ol
-                style={{ gridTemplateRows: '1.75rem repeat(288, minmax(0, 1fr)) auto' }}
+                style={{ gridTemplateRows: '1rem repeat(48, minmax(0, 1fr)) auto' }}
                 className="col-start-1 col-end-2 row-start-1 grid grid-cols-1 sm:grid-cols-7 sm:pr-8"
               >
-                <li
-                  style={{ gridRow: '74 / span 12' }}
-                  className="relative mt-px flex sm:col-start-3 dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
-                >
-                  <a
-                    href="#"
-                    className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-blue-50 p-2 text-xs/5 hover:bg-blue-100 dark:bg-blue-600/15 dark:hover:bg-blue-600/20"
+                {flightEvent.map((event, index) => (
+                  <li
+                    key={index}
+                    style={{ gridRow: event.gridRow }}
+                    // col-start-4 as default - this is always flight day
+                    // if the index of the map element is not 0, it must be a split day flight, so set col-start-5 for the second split (+ 1 day)
+                    className={`relative mt-px flex ${index === 0 ? "sm:col-start-4" : "sm:col-start-5"} sm:col-start-4 dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900`}
                   >
-                    <p className="order-1 font-semibold text-blue-700 dark:text-blue-300">Breakfast</p>
-                    <p className="text-blue-500 group-hover:text-blue-700 dark:text-blue-400 dark:group-hover:text-blue-300">
-                      <time dateTime="2022-01-12T06:00">6:00 AM</time>
-                    </p>
-                  </a>
-                </li>
-                <li
-                  style={{ gridRow: '92 / span 30' }}
-                  className="relative mt-px flex sm:col-start-3 dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
-                >
-                  <a
-                    href="#"
-                    className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-pink-50 p-2 text-xs/5 hover:bg-pink-100 dark:bg-pink-600/15 dark:hover:bg-pink-600/20"
-                  >
-                    <p className="order-1 font-semibold text-pink-700 dark:text-pink-300">Flight to Paris</p>
-                    <p className="text-pink-500 group-hover:text-pink-700 dark:text-pink-400 dark:group-hover:text-pink-300">
-                      <time dateTime="2022-01-12T07:30">7:30 AM</time>
-                    </p>
-                  </a>
-                </li>
-                <li
-                  style={{ gridRow: '122 / span 24' }}
-                  className="relative mt-px hidden sm:col-start-6 sm:flex dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
-                >
-                  <a
-                    href="#"
-                    className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-gray-100 p-2 text-xs/5 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/15"
-                  >
-                    <p className="order-1 font-semibold text-gray-700 dark:text-gray-300">
-                      Meeting with design team at Disney
-                    </p>
-                    <p className="text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300">
-                      <time dateTime="2022-01-15T10:00">10:00 AM</time>
-                    </p>
-                  </a>
-                </li>
+                    <a
+                      href="#"
+                      className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-blue-50 p-2 text-xs/5 hover:bg-blue-100 dark:bg-blue-600/15 dark:hover:bg-blue-600/20"
+                    >
+                      <p className="order-1 font-semibold text-blue-700 dark:text-blue-300">{event.label}</p>
+                      <p className="text-blue-500 group-hover:text-blue-700 dark:text-blue-400 dark:group-hover:text-blue-300">
+                        <time dateTime={event.startISO}>{event.startTime}</time>
+                      </p>
+                    </a>
+                  </li>
+                ))}
+
               </ol>
             </div>
           </div>

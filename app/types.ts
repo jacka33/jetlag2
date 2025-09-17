@@ -14,3 +14,11 @@ export type UsualSchedule = {
   dlmo: DateTime;
   ctn: DateTime;
 };
+
+export type CalendarEvent = {
+  label: string;
+  gridRow: string; // e.g. "17 / span 4"
+  startTime: string; // e.g. "07:30"
+  startISO: string;
+  endISO: string;
+}
