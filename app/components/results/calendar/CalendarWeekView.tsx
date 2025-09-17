@@ -18,7 +18,7 @@ export default function CalendarWeekView({ usualSchedule }: { usualSchedule: Usu
     <div className="flex h-full flex-col">
       <header className="flex flex-none items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-white/15 dark:bg-gray-800/50">
         <h1 className="text-base font-semibold text-gray-900 dark:text-white">
-          <time dateTime="2022-01">{DateTime.fromISO(depDateTime, { zone: departure?.time_zone }).toFormat("LLL yyyy")}</time>
+          <time dateTime={DateTime.fromISO(depDateTime, { zone: departure?.time_zone }).toFormat("yyyy-LL")}>{DateTime.fromISO(depDateTime, { zone: departure?.time_zone }).toFormat("LLL yyyy")}</time>
         </h1>
       </header>
       <div className="isolate flex flex-auto flex-col overflow-auto bg-white dark:bg-gray-900">
