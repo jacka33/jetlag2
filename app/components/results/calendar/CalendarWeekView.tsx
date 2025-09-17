@@ -11,8 +11,10 @@ export default function CalendarWeekView({ usualSchedule }: { usualSchedule: Usu
   const depDateTime = useAppSelector((state: RootState) => state.flight.departureDateTime);
   const flightTime = useAppSelector((state: RootState) => state.flight.time);
   const departure = useAppSelector((state: RootState) => state.flight.departure);
+  const arrival = useAppSelector((state: RootState) => state.flight.arrival);
 
-  const flightEvent: CalendarEvent[] = splitMultiDayEvent(DateTime.fromISO(depDateTime, { zone: departure?.time_zone }), DateTime.fromISO(depDateTime, { zone: departure?.time_zone }).plus({ minutes: flightTime || 0 }), 'Flight');
+
+  const flightEvent: CalendarEvent[] = splitMultiDayEvent(DateTime.fromISO(depDateTime, { zone: departure?.time_zone }), DateTime.fromISO(depDateTime, { zone: departure?.time_zone }).plus({ minutes: flightTime || 0 }), `${departure?.code} → ${arrival?.code}`);
   // todo: button to switch calendar view between departure / arrival timezones
   return (
     <div className="flex h-full flex-col">
@@ -252,9 +254,11 @@ export default function CalendarWeekView({ usualSchedule }: { usualSchedule: Usu
                       className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-blue-50 p-2 text-xs/5 hover:bg-blue-100 dark:bg-blue-600/15 dark:hover:bg-blue-600/20"
                     >
                       <p className="order-1 font-semibold text-blue-700 dark:text-blue-300">{event.label}</p>
-                      <p className="text-blue-500 group-hover:text-blue-700 dark:text-blue-400 dark:group-hover:text-blue-300">
-                        <time dateTime={event.startISO}>{event.startTime}</time>
-                      </p>
+                      {index === 0 && (
+                        <p className="text-blue-500 group-hover:text-blue-700 dark:text-blue-400 dark:group-hover:text-blue-300">
+                          <time dateTime={event.startISO}>{event.startTime}</time>
+                        </p>
+                      )}
                     </a>
                   </li>
                 ))}
