@@ -19,6 +19,8 @@ export default function Results() {
   const departure = useAppSelector((state) => state.flight.departure);
   const arrival = useAppSelector((state) => state.flight.arrival);
   const timeDifference = useAppSelector((state) => state.flight.timeDifference);
+  const depSun = useAppSelector((state) => state.flight.depSun);
+  const arrSun = useAppSelector((state) => state.flight.arrSun);
   const formSubmitted = useAppSelector((state) => state.flight.formSubmitted);
 
   // Redux user state
@@ -27,7 +29,8 @@ export default function Results() {
   const dlmo = useAppSelector((state) => state.user.dlmo);
   const ctn = useAppSelector((state) => state.user.ctn);
   // todo: calculate chronotype from sleep times
-  const chronotype = useAppSelector((state) => state.user.chronotype);
+  // todo: move this logic to reducer
+  // const chronotype = useAppSelector((state) => state.user.chronotype);
   const age = useAppSelector((state) => state.user.age);
 
   // Check if form has been submitted
@@ -63,17 +66,17 @@ export default function Results() {
           timezone_difference={timeDifference ? timeDifference.offset : 0}
           direction={direction}
           departure_time={depLocalTime || ''}
-          arrival_time="18:30" // placeholder todo: calculate
+          arrival_time={"18:30"} // placeholder todo: calculate
           flight_duration_minutes={flightTimeMins}
-          usual_sleep_time={usualSleepTime}
-          usual_wake_time={usualWakeTime}
-          dlmo={dlmo}
-          core_temp_nadir={ctn}
-          age={age ?? "Unknown"}
-          dep_sunrise='06:00' // placeholder
-          dep_sunset='18:00' // placeholder
-          arr_sunrise='07:00' // placeholder
-          arr_sunset='19:00' // placeholder
+          usual_sleep_time={usualSleepTime || ''}
+          usual_wake_time={usualWakeTime || ''}
+          dlmo={dlmo || ''}
+          core_temp_nadir={ctn || ''}
+          age={typeof age === 'string' ? age : (typeof age === 'number' ? String(age) : 'Unknown')}
+          dep_sunrise={depSun?.sunrise ? depSun.sunrise.toFormat("HH:mm") : ''}
+          dep_sunset={depSun?.sunset ? depSun.sunset.toFormat("HH:mm") : ''}
+          arr_sunrise={arrSun?.sunrise ? arrSun.sunrise.toFormat("HH:mm") : ''}
+          arr_sunset={arrSun?.sunset ? arrSun.sunset.toFormat("HH:mm") : ''}
         />
       )}
     </>

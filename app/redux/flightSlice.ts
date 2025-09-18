@@ -2,6 +2,9 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from './store'
 import { Airport, TimeDifference } from '../types'
 
+import SunCalc from 'suncalc';
+import { DateTime } from 'luxon';
+
 // Define a type for the slice state
 interface FlightState {
   distance: number
@@ -11,6 +14,8 @@ interface FlightState {
   arrival: Airport | undefined
   departureDateTime: string // ISO string (local time at departure airport)
   timeDifference: TimeDifference | null
+  depSun: { sunrise: DateTime; sunset: DateTime } | null
+  arrSun: { sunrise: DateTime; sunset: DateTime } | null
   formSubmitted: boolean
 }
 
@@ -23,6 +28,8 @@ const initialState: FlightState = {
   arrival: undefined,
   departureDateTime: "", // ISO string (local time at departure airport)
   timeDifference: null,
+  depSun: null,
+  arrSun: null,
   formSubmitted: false
 }
 
@@ -48,6 +55,15 @@ export const flightSlice = createSlice({
     },
     setDepartureDateTime: (state, action: PayloadAction<string>) => {
       state.departureDateTime = action.payload;
+      const dateObj = DateTime.fromISO(action.payload).toJSDate();
+      const depLat = Number(state.departure?.latitude) || 0;
+      const depLong = Number(state.departure?.longitude) || 0;
+      const arrLat = Number(state.arrival?.latitude) || 0;
+      const arrLong = Number(state.arrival?.longitude) || 0;
+      const depSunTimes = SunCalc.getTimes(dateObj, depLat, depLong);
+      const arrSunTimes = SunCalc.getTimes(dateObj, arrLat, arrLong);
+      state.depSun = { sunrise: DateTime.fromJSDate(depSunTimes.sunrise), sunset: DateTime.fromJSDate(depSunTimes.sunset) };
+      state.arrSun = { sunrise: DateTime.fromJSDate(arrSunTimes.sunrise), sunset: DateTime.fromJSDate(arrSunTimes.sunset) };
     },
     setTimeDifference: (state, action: PayloadAction<TimeDifference>) => {
       state.timeDifference = action.payload
@@ -68,5 +84,8 @@ export const selectDeparture = (state: RootState) => state.flight.departure
 export const selectArrival = (state: RootState) => state.flight.arrival
 export const selectDepartureDateTime = (state: RootState) => state.flight.departureDateTime
 export const selectTimeDifference = (state: RootState) => state.flight.timeDifference
+export const selectDepSun = (state: RootState) => state.flight.depSun
+export const selectArrSun = (state: RootState) => state.flight.arrSun
+export const selectFormSubmitted = (state: RootState) => state.flight.formSubmitted
 
 export default flightSlice.reducer
