@@ -180,7 +180,7 @@ export default function Form({ airports }: { airports: Airport[] }) {
                         </ComboboxButton>
                         <ComboboxOptions
                           transition
-                          className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg outline-1 outline-black/5 sm:text-sm dark:bg-gray-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10"
+                          className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg outline-1 outline-black/5 sm:text-sm dark:bg-gray-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10"
                         >
                           {filteredAirports.map((ap: Airport) => (
                             <ComboboxOption
@@ -237,7 +237,7 @@ export default function Form({ airports }: { airports: Airport[] }) {
                         </ComboboxButton>
                         <ComboboxOptions
                           transition
-                          className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg outline-1 outline-black/5 sm:text-sm dark:bg-gray-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10"
+                          className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg outline-1 outline-black/5 sm:text-sm dark:bg-gray-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10"
                         >
                           {filteredArrivalAirports.map((ap) => (
                             <ComboboxOption
