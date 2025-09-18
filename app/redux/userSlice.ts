@@ -8,7 +8,7 @@ interface UserState {
   dlmo: string
   ctn: string
   chronotype: string
-  age: number | null
+  age: string
 }
 
 // Define the initial state using that type
@@ -18,7 +18,7 @@ const initialState: UserState = {
   dlmo: "21:00",
   ctn: "05:00",
   chronotype: "Intermediate",
-  age: null
+  age: "Unknown"
 }
 
 export const userSlice = createSlice({
@@ -41,7 +41,7 @@ export const userSlice = createSlice({
     setChronotype: (state, action: PayloadAction<string>) => {
       state.chronotype = action.payload
     },
-    setAge: (state, action: PayloadAction<number | null>) => {
+    setAge: (state, action: PayloadAction<string>) => {
       state.age = action.payload
     },
   },

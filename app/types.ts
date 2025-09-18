@@ -35,7 +35,7 @@ export type PromptProps = {
   usual_wake_time: string;
   dlmo: string;
   core_temp_nadir: string;
-  age: number;
+  age: string;
   dep_sunrise: string;
   dep_sunset: string;
   arr_sunrise: string;

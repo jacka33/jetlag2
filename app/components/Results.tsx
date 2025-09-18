@@ -11,6 +11,7 @@ import InsightsClient from './results/insights/InsightsClient';
 export default function Results() {
   const [hasFormData, setHasFormData] = useState(false);
 
+  // Redux flight state
   const distance = useAppSelector((state) => state.flight.distance);
   const direction = useAppSelector((state) => state.flight.direction);
   const depTime = useAppSelector((state) => state.flight.departureDateTime);
@@ -19,6 +20,15 @@ export default function Results() {
   const arrival = useAppSelector((state) => state.flight.arrival);
   const timeDifference = useAppSelector((state) => state.flight.timeDifference);
   const formSubmitted = useAppSelector((state) => state.flight.formSubmitted);
+
+  // Redux user state
+  const usualSleepTime = useAppSelector((state) => state.user.usualSleepTime);
+  const usualWakeTime = useAppSelector((state) => state.user.usualWakeTime);
+  const dlmo = useAppSelector((state) => state.user.dlmo);
+  const ctn = useAppSelector((state) => state.user.ctn);
+  // todo: calculate chronotype from sleep times
+  const chronotype = useAppSelector((state) => state.user.chronotype);
+  const age = useAppSelector((state) => state.user.age);
 
   // Check if form has been submitted
   useEffect(() => {
@@ -53,13 +63,13 @@ export default function Results() {
           timezone_difference={timeDifference ? timeDifference.offset : 0}
           direction={direction}
           departure_time={depLocalTime || ''}
-          arrival_time="18:30" // placeholder
+          arrival_time="18:30" // placeholder todo: calculate
           flight_duration_minutes={flightTimeMins}
-          usual_sleep_time='23:00' // placeholder
-          usual_wake_time='07:00' // placeholder
-          dlmo='21:00' // placeholder
-          core_temp_nadir='05:00' // placeholder
-          age={30} // placeholder
+          usual_sleep_time={usualSleepTime}
+          usual_wake_time={usualWakeTime}
+          dlmo={dlmo}
+          core_temp_nadir={ctn}
+          age={age ?? "Unknown"}
           dep_sunrise='06:00' // placeholder
           dep_sunset='18:00' // placeholder
           arr_sunrise='07:00' // placeholder
