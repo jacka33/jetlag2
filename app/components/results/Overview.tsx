@@ -23,7 +23,7 @@ export default function Overview({ hasFormData, distance, flightTimeMins, direct
   const arrLocalTime = timeDifference?.arrISO ? DateTime.fromISO(timeDifference.arrISO, { zone: arrival?.time_zone }).toFormat("HH:mm") : null;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-12 border-b border-gray-900/10 py-12 dark:border-white/10" id="results">
+    <div id="overview" className="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-12 border-b border-gray-900/10 py-20 dark:border-white/10">
       <div>
         <h2 className="text-base/7 font-semibold text-gray-900 dark:text-white">General overview</h2>
         <div className="mt-1 space-y-2 text-sm/6 text-gray-600 dark:text-gray-400">

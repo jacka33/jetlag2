@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '../redux/hooks';
 import { DateTime } from 'luxon';
-import ResultsStickyNav from './results/nav/ResultsStickyNav';
+import ResultsStickyNav from './results/ResultsStickyNav';
 import Overview from './results/Overview';
 import SleepScheduleCalculator from '../utils/SleepScheduleCalculator';
 import Calendars from './results/Calendars';
@@ -50,7 +50,7 @@ export default function Results() {
   return (
     <>
       <ResultsStickyNav />
-      <Overview
+      <Overview 
         hasFormData={hasFormData}
         distance={distance}
         flightTimeMins={flightTimeMins}

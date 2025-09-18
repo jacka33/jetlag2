@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import Insights from "./Insights";
+import Insights from "../Insights";
 import { PromptProps } from "@/app/types";
 
 const fetcher = async (url: string, body: PromptProps) => {

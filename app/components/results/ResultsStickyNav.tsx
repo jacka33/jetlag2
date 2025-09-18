@@ -1,10 +1,10 @@
 import { ChevronDownIcon } from '@heroicons/react/16/solid'
 
 const tabs = [
-  { name: 'Overview', href: '#', current: true },
-  { name: 'Schedule', href: '#', current: false },
-  { name: 'Recommendations', href: '#', current: false },
-  { name: 'Insights', href: '#', current: false },
+  { name: 'Overview', href: '#overview', current: true },
+  { name: 'Calendar', href: '#calendar', current: false },
+  { name: 'Graphs (to do)', href: '#', current: false },
+  { name: 'Insights', href: '#insights', current: false },
 ]
 
 function classNames(...classes: (string | undefined | null | boolean)[]) {
@@ -14,7 +14,7 @@ function classNames(...classes: (string | undefined | null | boolean)[]) {
 export default function ResultsStickyNav() {
   // todo: make sticky
   return (
-    <div>
+    <div className='sticky webkit-sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-white/10'>
       <div className="grid grid-cols-1 sm:hidden">
         {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
         <select
