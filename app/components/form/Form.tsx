@@ -5,13 +5,13 @@ import { useState } from 'react'
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { isValidDateTime } from '../utils/DateTimeValidator';
-import { CalculateDistance, CalculateFlightTime, CalculateDirection } from '../utils/FlightCalculator';
-import CalculateTimeDifference from '../utils/TimeDifferenceCalculator';
-import { useAppDispatch } from '../redux/hooks';
-import { setDistance, setTime, setDirection, setDepartureDateTime, setDeparture, setArrival, setTimeDifference, setFormSubmitted } from '../redux/flightSlice';
+import { isValidDateTime } from '../../utils/DateTimeValidator';
+import { CalculateDistance, CalculateFlightTime, CalculateDirection } from '../../utils/FlightCalculator';
+import CalculateTimeDifference from '../../utils/TimeDifferenceCalculator';
+import { useAppDispatch } from '../../redux/hooks';
+import { setDistance, setTime, setDirection, setDepartureDateTime, setDeparture, setArrival, setTimeDifference, setFormSubmitted } from '../../redux/flightSlice';
 
-import type { Airport } from '../types';
+import type { Airport } from '../../types';
 import { DateTime } from 'luxon';
 
 export const AirportSchema = z.object({

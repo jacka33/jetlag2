@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { parse } from "csv-parse/sync";
-import Form from "./Form";
+import Form from "./form/Form";
 
 import type { Airport } from "../types";
 

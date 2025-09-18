@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import type { Airport, TimeDifference } from '../../types'
 import LagScore from './overview/LagScore'
 import MapboxMap from './overview/MapboxMap'
-import Tooltip from '../Tooltip'
+import Tooltip from '../generic/Tooltip'
 
 export default function Overview({ hasFormData, distance, flightTimeMins, direction, timeDifference, depLocalTime, departure, arrival }: {
   hasFormData: boolean

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AirportSchema } from "./components/Form";
+import { AirportSchema } from "./components/form/Form";
 import type { DateTime } from "luxon";
 
 export type Airport = z.infer<typeof AirportSchema> | null;

@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import flightReducer from './flightSlice'
+import userReducer from './userSlice'
 
 export const store = configureStore({
   reducer: {
     flight: flightReducer,
+    user: userReducer,
   },
 })
 
