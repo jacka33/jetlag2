@@ -20,9 +20,10 @@ Copy environment configuration and add your API keys locally:
 cp env.dist env.local
 ```
 
-Run the development server:
+Install dependencies and run dev server:
 
 ```bash
+npm install
 npm run dev
 ```
 
