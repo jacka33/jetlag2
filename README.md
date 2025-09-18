@@ -14,7 +14,13 @@ Features:
 
 ## Set up
 
-First, run the development server:
+Copy environment configuration and add your API keys locally:
+
+```bash
+cp env.dist env.local
+```
+
+Run the development server:
 
 ```bash
 npm run dev
