@@ -13,9 +13,10 @@ interface FlightState {
   departure: Airport | undefined
   arrival: Airport | undefined
   departureDateTime: string // ISO string (local time at departure airport)
+  arrivalDateTime: string // ISO string (local time at arrival airport) --- IGNORE ---
   timeDifference: TimeDifference | null
-  depSun: { sunrise: DateTime; sunset: DateTime } | null
-  arrSun: { sunrise: DateTime; sunset: DateTime } | null
+  depSun: { sunrise: string; sunset: string } | null
+  arrSun: { sunrise: string; sunset: string } | null
   formSubmitted: boolean
 }
 
@@ -27,6 +28,7 @@ const initialState: FlightState = {
   departure: undefined,
   arrival: undefined,
   departureDateTime: "", // ISO string (local time at departure airport)
+  arrivalDateTime: "", // ISO string (local time at arrival airport)
   timeDifference: null,
   depSun: null,
   arrSun: null,
@@ -38,35 +40,44 @@ export const flightSlice = createSlice({
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
-    setDistance: (state, action: PayloadAction<number>) => {
-      state.distance = action.payload
-    },
-    setTime: (state, action: PayloadAction<number>) => {
-      state.time = action.payload
-    },
-    setDirection: (state, action: PayloadAction<string>) => {
-      state.direction = action.payload
-    },
     setDeparture: (state, action: PayloadAction<Airport>) => {
       state.departure = action.payload
     },
     setArrival: (state, action: PayloadAction<Airport>) => {
       state.arrival = action.payload
     },
+    setTime: (state, action: PayloadAction<number>) => {
+      state.time = action.payload
+
+    },
     setDepartureDateTime: (state, action: PayloadAction<string>) => {
-      state.departureDateTime = action.payload;
-      const dateObj = DateTime.fromISO(action.payload).toJSDate();
+      state.departureDateTime = DateTime.fromISO(action.payload, { zone: state.departure?.time_zone }).toISO() || "";
+      state.arrivalDateTime = DateTime.fromISO(action.payload, { zone: state.arrival?.time_zone }).plus({ minutes: state.time }).toISO() || "";
+      const depDateObj = DateTime.fromISO(action.payload, { zone: state.departure?.time_zone }).toJSDate();
+      const arrDateObj = DateTime.fromISO(action.payload, { zone: state.arrival?.time_zone }).plus({ minutes: state.time }).toJSDate();
       const depLat = Number(state.departure?.latitude) || 0;
       const depLong = Number(state.departure?.longitude) || 0;
       const arrLat = Number(state.arrival?.latitude) || 0;
       const arrLong = Number(state.arrival?.longitude) || 0;
-      const depSunTimes = SunCalc.getTimes(dateObj, depLat, depLong);
-      const arrSunTimes = SunCalc.getTimes(dateObj, arrLat, arrLong);
-      state.depSun = { sunrise: DateTime.fromJSDate(depSunTimes.sunrise), sunset: DateTime.fromJSDate(depSunTimes.sunset) };
-      state.arrSun = { sunrise: DateTime.fromJSDate(arrSunTimes.sunrise), sunset: DateTime.fromJSDate(arrSunTimes.sunset) };
+      const depSunTimes = SunCalc.getTimes(depDateObj, depLat, depLong);
+      const arrSunTimes = SunCalc.getTimes(arrDateObj, arrLat, arrLong);
+      state.depSun = {
+        sunrise: DateTime.fromJSDate(depSunTimes.sunrise).toISO() ?? "",
+        sunset: DateTime.fromJSDate(depSunTimes.sunset).toISO() ?? ""
+      };
+      state.arrSun = {
+        sunrise: DateTime.fromJSDate(arrSunTimes.sunrise).toISO() ?? "",
+        sunset: DateTime.fromJSDate(arrSunTimes.sunset).toISO() ?? ""
+      };
     },
     setTimeDifference: (state, action: PayloadAction<TimeDifference>) => {
       state.timeDifference = action.payload
+    },
+    setDirection: (state, action: PayloadAction<string>) => {
+      state.direction = action.payload
+    },
+    setDistance: (state, action: PayloadAction<number>) => {
+      state.distance = action.payload
     },
     setFormSubmitted: (state, action: PayloadAction<boolean>) => {
       state.formSubmitted = action.payload

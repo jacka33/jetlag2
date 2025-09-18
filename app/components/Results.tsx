@@ -14,7 +14,8 @@ export default function Results() {
   // Redux flight state
   const distance = useAppSelector((state) => state.flight.distance);
   const direction = useAppSelector((state) => state.flight.direction);
-  const depTime = useAppSelector((state) => state.flight.departureDateTime);
+  const depDateTime = useAppSelector((state) => state.flight.departureDateTime);
+  const arrDateTime = useAppSelector((state) => state.flight.arrivalDateTime);
   const flightTimeMins = useAppSelector((state) => state.flight.time);
   const departure = useAppSelector((state) => state.flight.departure);
   const arrival = useAppSelector((state) => state.flight.arrival);
@@ -43,7 +44,8 @@ export default function Results() {
   }, [departure, arrival]);
 
   // Extract local departure time from string
-  const depLocalTime = depTime ? DateTime.fromISO(depTime).toFormat('HH:mm') : '';
+  const depLocalTime = depDateTime ? DateTime.fromISO(depDateTime).toFormat('HH:mm') : '';
+  const arrLocalTime = arrDateTime ? DateTime.fromISO(arrDateTime).toFormat('HH:mm') : '';
 
   return (
     <>
@@ -66,17 +68,17 @@ export default function Results() {
           timezone_difference={timeDifference ? timeDifference.offset : 0}
           direction={direction}
           departure_time={depLocalTime || ''}
-          arrival_time={"18:30"} // placeholder todo: calculate
+          arrival_time={arrLocalTime || ''}
           flight_duration_minutes={flightTimeMins}
           usual_sleep_time={usualSleepTime || ''}
           usual_wake_time={usualWakeTime || ''}
           dlmo={dlmo || ''}
           core_temp_nadir={ctn || ''}
           age={typeof age === 'string' ? age : (typeof age === 'number' ? String(age) : 'Unknown')}
-          dep_sunrise={depSun?.sunrise ? depSun.sunrise.toFormat("HH:mm") : ''}
-          dep_sunset={depSun?.sunset ? depSun.sunset.toFormat("HH:mm") : ''}
-          arr_sunrise={arrSun?.sunrise ? arrSun.sunrise.toFormat("HH:mm") : ''}
-          arr_sunset={arrSun?.sunset ? arrSun.sunset.toFormat("HH:mm") : ''}
+          dep_sunrise={depSun?.sunrise ? DateTime.fromISO(depSun.sunrise).toFormat("HH:mm") : ''}
+          dep_sunset={depSun?.sunset ? DateTime.fromISO(depSun.sunset).toFormat("HH:mm") : ''}
+          arr_sunrise={arrSun?.sunrise ? DateTime.fromISO(arrSun.sunrise).toFormat("HH:mm") : ''}
+          arr_sunset={arrSun?.sunset ? DateTime.fromISO(arrSun.sunset).toFormat("HH:mm") : ''}
         />
       )}
     </>
