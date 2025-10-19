@@ -11,7 +11,7 @@ export default function Calendars({ hasFormData }: CalendarsProps) {
 
   const usualSchedule = SleepScheduleCalculator();
   return (
-    <div id="calendar" className="w-full">
+    <div id="calendar" className="w-full pb-20">
       {hasFormData ? (
         <CalendarWeekView usualSchedule={usualSchedule} />
       ) : (
