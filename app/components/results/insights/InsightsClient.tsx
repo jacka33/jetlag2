@@ -40,7 +40,10 @@ export default function InsightsClient(props: PromptProps) {
   </div>;
   if (error) return <div>Error: {error.message}</div>;
   if (!data) return null;
+  console.log('Full response:', data);
 
-  // @ts-expect-error: dont know openai types yet
-  return <Insights response={data.response} />;
+      const points = JSON.parse(data.response.output_text);
+
+
+  return <Insights response={points} />;
 }
