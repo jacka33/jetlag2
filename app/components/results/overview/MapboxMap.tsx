@@ -73,7 +73,7 @@ export default function MapArcs({ from, to }: Props) {
           type: 'line',
           source: 'route',
           paint: {
-            'line-color': '#ff0080',
+            'line-color': '#155dfc',
             'line-width': 3
           }
         });
@@ -110,7 +110,7 @@ export default function MapArcs({ from, to }: Props) {
           source: 'markers',
           paint: {
             'circle-radius': 8,
-            'circle-color': '#ff0080',
+            'circle-color': '#155dfc',
             'circle-stroke-width': 2,
             'circle-stroke-color': '#ffffff'
           }
