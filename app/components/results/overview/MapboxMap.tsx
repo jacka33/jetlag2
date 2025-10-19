@@ -50,7 +50,7 @@ export default function MapArcs({ from, to }: Props) {
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         projection: 'mercator',
-        style: 'mapbox://styles/mapbox/light-v11',
+        style: 'mapbox://styles/jack380/cmfipzh7w004f01sebcdh2q57',
         center: [(Number(from[0]) + Number(to[0])) / 2, (Number(from[1]) + Number(to[1])) / 2],
         zoom: 2
       });
