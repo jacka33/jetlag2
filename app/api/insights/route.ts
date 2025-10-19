@@ -2,6 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { PromptProps } from "@/app/types";
 
+import { zodTextFormat } from "openai/helpers/zod";
+import { z } from "zod";
+
+interface OpenAIErrorResponse {
+  response?: {
+    status: number;
+    statusText: string;
+    data: unknown;
+    headers: Record<string, string>;
+  };
+  message: string;
+}
+
+const PointsExtraction = z.object({
+  points: z.array(z.string())
+});
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -49,11 +66,35 @@ export async function POST(req: NextRequest) {
           dep_sunset,
           arr_sunrise,
           arr_sunset
-        }
-      }
+        },
+
+      },
+      text: {
+        format: zodTextFormat(PointsExtraction, "points"),
+
+      },
     });
+
+
     return NextResponse.json({ response });
   } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    // Log the full error object for debugging
+    console.error('OpenAI API Error:', error);
+
+    // OpenAI errors often have additional details in the response property
+    const openAIError = error as OpenAIErrorResponse;
+    if (openAIError.response) {
+      console.error('OpenAI Error Response:', {
+        status: openAIError.response.status,
+        statusText: openAIError.response.statusText,
+        data: openAIError.response.data,
+        headers: openAIError.response.headers
+      });
+    }
+
+    return NextResponse.json({
+      error: openAIError.message,
+      details: openAIError.response?.data || undefined
+    }, { status: 500 });
   }
 }

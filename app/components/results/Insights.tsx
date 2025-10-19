@@ -1,9 +1,22 @@
 import React from 'react'
 
-const Insights: React.FC = (response) => {
+interface InsightsProps {
+  response: {
+    points: string[]
+  }
+}
+
+const Insights: React.FC<InsightsProps> = ({ response }) => {
   console.log('AI Insights response:', response);
   return (
-    <div id="insights">check console log for ai insights</div>
+    <div id="insights" className='grid grid-cols-1 md:grid-cols-2 md:gap-x-12 pb-20'>
+      <div>AI insights</div>
+      <div>
+        {response.points.map((point, index) => (
+          <p key={index} className="text-gray-600 text-base">{point}</p>
+        ))}
+      </div>
+    </div>
   )
 }
 
