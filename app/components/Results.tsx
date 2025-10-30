@@ -47,10 +47,12 @@ export default function Results() {
   const depLocalTime = depDateTime ? DateTime.fromISO(depDateTime).toFormat('HH:mm') : '';
   const arrLocalTime = arrDateTime ? DateTime.fromISO(arrDateTime).toFormat('HH:mm') : '';
 
+  console.log(depSun, arrSun);
+
   return (
     <>
       <ResultsStickyNav />
-      <Overview 
+      <Overview
         hasFormData={hasFormData}
         distance={distance}
         flightTimeMins={flightTimeMins}
@@ -75,10 +77,10 @@ export default function Results() {
           dlmo={dlmo || ''}
           core_temp_nadir={ctn || ''}
           age={typeof age === 'string' ? age : (typeof age === 'number' ? String(age) : 'Unknown')}
-          dep_sunrise={depSun?.sunrise ? DateTime.fromISO(depSun.sunrise).toFormat("HH:mm") : ''}
-          dep_sunset={depSun?.sunset ? DateTime.fromISO(depSun.sunset).toFormat("HH:mm") : ''}
-          arr_sunrise={arrSun?.sunrise ? DateTime.fromISO(arrSun.sunrise).toFormat("HH:mm") : ''}
-          arr_sunset={arrSun?.sunset ? DateTime.fromISO(arrSun.sunset).toFormat("HH:mm") : ''}
+          dep_sunrise={depSun?.sunrise ?? ""}
+          dep_sunset={depSun?.sunset ?? ""}
+          arr_sunrise={arrSun?.sunrise ?? ""}
+          arr_sunset={arrSun?.sunset ?? ""}
         />
       )}
     </>

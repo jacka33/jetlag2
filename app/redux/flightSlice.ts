@@ -51,23 +51,33 @@ export const flightSlice = createSlice({
 
     },
     setDepartureDateTime: (state, action: PayloadAction<string>) => {
-      state.departureDateTime = DateTime.fromISO(action.payload, { zone: state.departure?.time_zone }).toISO() || "";
-      state.arrivalDateTime = DateTime.fromISO(action.payload, { zone: state.arrival?.time_zone }).plus({ minutes: state.time }).toISO() || "";
-      const depDateObj = DateTime.fromISO(action.payload, { zone: state.departure?.time_zone }).toJSDate();
-      const arrDateObj = DateTime.fromISO(action.payload, { zone: state.arrival?.time_zone }).plus({ minutes: state.time }).toJSDate();
+      // Set departure and arrival times with proper timezone handling
+      const depDateTime = DateTime.fromISO(action.payload, { zone: state.departure?.time_zone });
+      const arrDateTime = depDateTime
+        .plus({ minutes: state.time })
+        .setZone(state.arrival?.time_zone);
+
+      state.departureDateTime = depDateTime.toISO() || "";
+      state.arrivalDateTime = arrDateTime.toISO() || "";
+
+      // Calculate sun times for departure location in departure timezone
       const depLat = Number(state.departure?.latitude) || 0;
       const depLong = Number(state.departure?.longitude) || 0;
+      const depSunTimes = SunCalc.getTimes(depDateTime.toJSDate(), depLat, depLong);
+
+      // Calculate sun times for arrival location in arrival timezone
       const arrLat = Number(state.arrival?.latitude) || 0;
       const arrLong = Number(state.arrival?.longitude) || 0;
-      const depSunTimes = SunCalc.getTimes(depDateObj, depLat, depLong);
-      const arrSunTimes = SunCalc.getTimes(arrDateObj, arrLat, arrLong);
+      const arrSunTimes = SunCalc.getTimes(arrDateTime.toJSDate(), arrLat, arrLong);
+
+      // Set sun times in state
       state.depSun = {
-        sunrise: DateTime.fromJSDate(depSunTimes.sunrise).toISO() ?? "",
-        sunset: DateTime.fromJSDate(depSunTimes.sunset).toISO() ?? ""
+        sunrise: DateTime.fromJSDate(depSunTimes.sunrise, { zone: state.departure?.time_zone }).toFormat("HH:mm") ?? "",
+        sunset: DateTime.fromJSDate(depSunTimes.sunset, { zone: state.departure?.time_zone }).toFormat("HH:mm") ?? ""
       };
       state.arrSun = {
-        sunrise: DateTime.fromJSDate(arrSunTimes.sunrise).toISO() ?? "",
-        sunset: DateTime.fromJSDate(arrSunTimes.sunset).toISO() ?? ""
+        sunrise: DateTime.fromJSDate(arrSunTimes.sunrise, { zone: state.arrival?.time_zone }).toFormat("HH:mm") ?? "",
+        sunset: DateTime.fromJSDate(arrSunTimes.sunset, { zone: state.arrival?.time_zone }).toFormat("HH:mm") ?? ""
       };
     },
     setTimeDifference: (state, action: PayloadAction<TimeDifference>) => {
