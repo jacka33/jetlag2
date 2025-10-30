@@ -47,8 +47,6 @@ export default function Results() {
   const depLocalTime = depDateTime ? DateTime.fromISO(depDateTime).toFormat('HH:mm') : '';
   const arrLocalTime = arrDateTime ? DateTime.fromISO(arrDateTime).toFormat('HH:mm') : '';
 
-  console.log(depSun, arrSun);
-
   return (
     <>
       <ResultsStickyNav />
