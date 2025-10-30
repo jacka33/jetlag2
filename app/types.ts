@@ -6,6 +6,12 @@ export type Airport = z.infer<typeof AirportSchema> | null;
 
 export type TimeDifference = { arrISO: string; offset: number } | null;
 
+export type Sun = {
+  departure: { sunrise: string; sunset: string; },
+  arrival: { sunrise: string; sunset: string }
+}
+  | null;
+
 export type UsualSchedule = {
   relativeDay: number;
   day: DateTime;

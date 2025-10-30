@@ -9,10 +9,11 @@ import { isValidDateTime } from '../../utils/DateTimeValidator';
 import { CalculateDistance, CalculateFlightTime, CalculateDirection } from '../../utils/FlightCalculator';
 import CalculateTimeDifference from '../../utils/TimeDifferenceCalculator';
 import { useAppDispatch } from '../../redux/hooks';
-import { setDistance, setTime, setDirection, setDepartureDateTime, setDeparture, setArrival, setTimeDifference, setFormSubmitted } from '../../redux/flightSlice';
+import { setDistance, setTime, setDirection, setDepartureDateTime, setDeparture, setArrival, setTimeDifference, setFormSubmitted, setSun } from '../../redux/flightSlice';
 
 import type { Airport } from '../../types';
 import { DateTime } from 'luxon';
+import { sunTimesForLocalDate } from '@/app/utils/sun';
 
 export const AirportSchema = z.object({
   code: z.string(),
@@ -95,6 +96,48 @@ export default function Form({ airports }: { airports: Airport[] }) {
     const flightDirection = CalculateDirection(parseFloat(data.departure!.longitude), parseFloat(data.arrival!.longitude));
     const timeDifference = CalculateTimeDifference(data.departure!.time_zone, data.arrival!.time_zone, data.departureDateTime, flightTime);
 
+    // Parse departure in departure TZ, add flight time, then convert to arrival TZ
+    const depDt = DateTime.fromISO(data.departureDateTime, { zone: data.departure!.time_zone });
+    const arrDt = depDt.plus({ minutes: flightTime }).setZone(data.arrival!.time_zone);
+
+    // Use local noon DateTimes for sun calculations
+    const depForSun = depDt.set({ hour: 12, minute: 0, second: 0, millisecond: 0 });
+    const arrForSun = arrDt.set({ hour: 12, minute: 0, second: 0, millisecond: 0 });
+
+    // Debug logs to verify we're using the intended local days / coords
+    console.log('depForSun ISO:', depForSun.toISO(), 'zone:', data.departure!.time_zone);
+    console.log('arrForSun ISO:', arrForSun.toISO(), 'zone:', data.arrival!.time_zone);
+    console.log('arrival coords:', data.arrival!.latitude, data.arrival!.longitude);
+
+    // Pass JS Date objects to sunTimesForLocalDate (safer than re-parsing ISO strings)
+    const depSunTimes = sunTimesForLocalDate(
+      depForSun.toJSDate(),
+      parseFloat(data.departure!.latitude),
+      parseFloat(data.departure!.longitude),
+      data.departure!.time_zone
+    );
+
+    const arrSunTimes = sunTimesForLocalDate(
+      arrForSun.toJSDate(),
+      parseFloat(data.arrival!.latitude),
+      parseFloat(data.arrival!.longitude),
+      data.arrival!.time_zone
+    );
+
+    console.log('depSunTimes:', depSunTimes, 'arrSunTimes:', arrSunTimes);
+
+    const sunDispatchPayload = {
+      departure: {
+        sunrise: depSunTimes.sunrise ?? "",
+        sunset: depSunTimes.sunset ?? ""
+      },
+      arrival: {
+        sunrise: arrSunTimes.sunrise ?? "",
+        sunset: arrSunTimes.sunset ?? ""
+      }
+    };
+
+
     dispatch(setDistance(flightDistance)); // in nm
     dispatch(setTime(flightTime)); // in minutes
     dispatch(setDirection(flightDirection));
@@ -103,9 +146,7 @@ export default function Form({ airports }: { airports: Airport[] }) {
     dispatch(setDepartureDateTime(data.departureDateTime));
     dispatch(setTimeDifference(timeDifference)); // in hours
     dispatch(setFormSubmitted(true)); // Mark form as submitted
-
-    console.log(data);
-
+    dispatch(setSun(sunDispatchPayload));
   }
 
   const filteredAirports = query.length > 0
@@ -137,6 +178,7 @@ export default function Form({ airports }: { airports: Airport[] }) {
     dispatch(setDirection(''));
     dispatch(setDepartureDateTime(''));
     dispatch(setTimeDifference(null));
+    dispatch(setSun(null));
     dispatch(setFormSubmitted(false)); // Mark form as not submitted
   };
 
