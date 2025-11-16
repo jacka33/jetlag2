@@ -1,4 +1,27 @@
 import React from 'react'
+import {
+  AcademicCapIcon,
+  BanknotesIcon,
+  CheckBadgeIcon,
+  ClockIcon,
+  BoltIcon,
+  UsersIcon,
+  PaperAirplaneIcon
+} from '@heroicons/react/24/outline'
+
+
+
+interface InsightPoint {
+  title: string
+  text: string
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
+  iconForeground: string
+  iconBackground: string
+}
+
+function classNames(...classes: Array<string>): string {
+  return classes.filter(Boolean).join(' ')
+}
 
 interface InsightsProps {
   response: {
@@ -8,12 +31,75 @@ interface InsightsProps {
 
 const Insights: React.FC<InsightsProps> = ({ response }) => {
   console.log('AI Insights response:', response);
+  //todo: handle case where response.points is not as expected
+  const points: InsightPoint[] = [
+    {
+      title: 'Before departure tips',
+      text: response.points[0],
+      icon: ClockIcon,
+      iconForeground: 'text-teal-700 dark:text-teal-400',
+      iconBackground: 'bg-teal-50 dark:bg-teal-500/10',
+    },
+    {
+      title: 'In-flight',
+      text: response.points[1],
+      icon: PaperAirplaneIcon,
+      iconForeground: 'text-purple-700 dark:text-purple-400',
+      iconBackground: 'bg-purple-50 dark:bg-purple-500/10',
+    },
+    {
+      title: 'Upon arrival',
+      text: response.points[2],
+      icon: ClockIcon,
+      iconForeground: 'text-sky-700 dark:text-sky-400',
+      iconBackground: 'bg-sky-50 dark:bg-sky-500/10',
+    },
+    {
+      title: 'Adaptation',
+      text: response.points[3],
+      icon: BoltIcon,
+      iconForeground: 'text-yellow-700 dark:text-yellow-400',
+      iconBackground: 'bg-yellow-50 dark:bg-yellow-500/10',
+    },
+  ]
   return (
-    <div id="insights" className='grid grid-cols-1 md:grid-cols-2 md:gap-x-12 pb-20'>
-      <div>AI insights</div>
-      <div>
-        {response.points.map((point, index) => (
-          <p key={index} className="text-gray-600 text-base">{point}</p>
+    <div id="insights" className='grid grid-cols-1 md:grid-cols-4 md:gap-x-12 pb-20'>
+      <div className='col-span-1 text-lg font-semibold text-gray-900 dark:text-white'>AI insights</div>
+      <div className="col-span-3 divide-y divide-gray-200 overflow-hidden rounded-lg bg-gray-200 shadow-sm sm:grid sm:grid-cols-2 sm:divide-y-0 dark:divide-white/10 dark:bg-gray-900 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/20">
+        {points.map((point, pointIdx) => (
+          <div
+            key={point.title}
+            className={classNames(
+              pointIdx === 0 ? 'rounded-tl-lg rounded-tr-lg sm:rounded-tr-none' : '',
+              pointIdx === 1 ? 'sm:rounded-tr-lg' : '',
+              pointIdx === points.length - 2 ? 'sm:rounded-bl-lg' : '',
+              pointIdx === points.length - 1 ? 'rounded-br-lg rounded-bl-lg sm:rounded-bl-none' : '',
+              'group relative border-gray-200 bg-white p-6 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 sm:odd:not-nth-last-2:border-b sm:even:border-l sm:even:not-last:border-b dark:border-white/10 dark:bg-gray-800/50 dark:focus-within:outline-indigo-500',
+            )}
+          >
+            <div>
+              <span className={classNames(point.iconBackground, point.iconForeground, 'inline-flex rounded-lg p-3')}>
+                <point.icon aria-hidden="true" className="size-6" />
+              </span>
+            </div>
+            <div className="mt-8">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+
+                {point.title}
+              </h3>
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                {point.text}
+              </p>
+            </div>
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute top-6 right-6 text-gray-300 group-hover:text-gray-400 dark:text-gray-500 dark:group-hover:text-gray-200"
+            >
+              <svg fill="currentColor" viewBox="0 0 24 24" className="size-6">
+                <path d="M20 4h1a1 1 0 00-1-1v1zm-1 12a1 1 0 102 0h-2zM8 3a1 1 0 000 2V3zM3.293 19.293a1 1 0 101.414 1.414l-1.414-1.414zM19 4v12h2V4h-2zm1-1H8v2h12V3zm-.707.293l-16 16 1.414 1.414 16-16-1.414-1.414z" />
+              </svg>
+            </span>
+          </div>
         ))}
       </div>
     </div>

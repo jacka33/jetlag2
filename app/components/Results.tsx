@@ -20,8 +20,7 @@ export default function Results() {
   const departure = useAppSelector((state) => state.flight.departure);
   const arrival = useAppSelector((state) => state.flight.arrival);
   const timeDifference = useAppSelector((state) => state.flight.timeDifference);
-  const depSun = useAppSelector((state) => state.flight.depSun);
-  const arrSun = useAppSelector((state) => state.flight.arrSun);
+  const sun = useAppSelector((state) => state.flight.sun);
   const formSubmitted = useAppSelector((state) => state.flight.formSubmitted);
 
   // Redux user state
@@ -30,7 +29,6 @@ export default function Results() {
   const dlmo = useAppSelector((state) => state.user.dlmo);
   const ctn = useAppSelector((state) => state.user.ctn);
   // todo: calculate chronotype from sleep times
-  // todo: move this logic to reducer
   // const chronotype = useAppSelector((state) => state.user.chronotype);
   const age = useAppSelector((state) => state.user.age);
 
@@ -50,7 +48,7 @@ export default function Results() {
   return (
     <>
       <ResultsStickyNav />
-      <Overview 
+      <Overview
         hasFormData={hasFormData}
         distance={distance}
         flightTimeMins={flightTimeMins}
@@ -75,10 +73,10 @@ export default function Results() {
           dlmo={dlmo || ''}
           core_temp_nadir={ctn || ''}
           age={typeof age === 'string' ? age : (typeof age === 'number' ? String(age) : 'Unknown')}
-          dep_sunrise={depSun?.sunrise ? DateTime.fromISO(depSun.sunrise).toFormat("HH:mm") : ''}
-          dep_sunset={depSun?.sunset ? DateTime.fromISO(depSun.sunset).toFormat("HH:mm") : ''}
-          arr_sunrise={arrSun?.sunrise ? DateTime.fromISO(arrSun.sunrise).toFormat("HH:mm") : ''}
-          arr_sunset={arrSun?.sunset ? DateTime.fromISO(arrSun.sunset).toFormat("HH:mm") : ''}
+          dep_sunrise={DateTime.fromISO(sun?.departure.sunrise || '').toFormat("HH:mm") ?? ""}
+          dep_sunset={DateTime.fromISO(sun?.departure.sunset || '').toFormat("HH:mm") ?? ""}
+          arr_sunrise={DateTime.fromISO(sun?.arrival.sunrise || '').toFormat("HH:mm") ?? ""}
+          arr_sunset={DateTime.fromISO(sun?.arrival.sunset || '').toFormat("HH:mm") ?? ""}
         />
       )}
     </>
