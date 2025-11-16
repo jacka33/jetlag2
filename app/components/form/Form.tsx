@@ -13,8 +13,9 @@ import { setDistance, setTime, setDirection, setDepartureDateTime, setDeparture,
 
 import type { Airport } from '../../types';
 import { DateTime } from 'luxon';
-import { sunTimesForLocalDate } from '@/app/utils/sun';
+import { sunTimesForLocalDate } from '@/app/utils/SunCalculator';
 
+// todo: check if this can be defined in the types file and simply inferred here by zod
 export const AirportSchema = z.object({
   code: z.string(),
   icao: z.string().nullable(),
